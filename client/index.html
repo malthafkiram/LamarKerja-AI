@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="alternate icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>LamarKerja AI - Smart Automated Job Application Suite</title>
+    <meta name="description" content="Aplikasi otomatisasi melamar pekerjaan cerdas: scan brosur loker, direktori lowongan multi-portal, AI cover letter & live code arena." />
+    <meta property="og:title" content="LamarKerja AI" />
+    <meta property="og:description" content="Aplikasi otomatisasi melamar pekerjaan cerdas: scan brosur loker, direktori lowongan multi-portal, AI cover letter & live code arena." />
+    <meta property="og:image" content="/logo.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:image" content="/logo.png" />
+    
+    <!-- PWA & Android Meta Tags -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#07090E" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="LamarKerja AI" />
+
+    <!-- Google Fonts: Inter & Plus Jakarta Sans (Super Clean & Legible) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('SW registration note:', err);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
+

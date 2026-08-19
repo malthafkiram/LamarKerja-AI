@@ -1,0 +1,31 @@
+{
+  "short_name": "LamarKerja AI",
+  "name": "LamarKerja AI - Smart Job Hunting Suite",
+  "description": "Aplikasi Otomatisasi Lamaran Kerja, AI Scan Brosur, Direktori Loker Multi-Platform, dan Live Code Arena.",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#07090E",
+  "theme_color": "#0EA5E9",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/"
+}
