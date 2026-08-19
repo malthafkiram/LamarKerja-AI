@@ -1,7 +1,7 @@
 /**
  * Middleware JWT: wajib login, opsional, dan khusus admin.
  */
-import './loadEnv.js';
+import '../loadEnv.js';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
