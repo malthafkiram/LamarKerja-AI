@@ -1,6 +1,7 @@
 /**
  * Middleware JWT: wajib login, opsional, dan khusus admin.
  */
+import './loadEnv.js';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
@@ -10,12 +11,13 @@ const INSECURE_DEFAULTS = new Set([
   'lamarkerja_super_secret_jwt_key_2026'
 ]);
 
-const JWT_SECRET = process.env.JWT_SECRET || '';
+const JWT_SECRET = String(process.env.JWT_SECRET || '').trim();
 
 if (process.env.NODE_ENV === 'production' && INSECURE_DEFAULTS.has(JWT_SECRET)) {
-  throw new Error(
-    'JWT_SECRET wajib diisi string acak di production. Jangan pakai default.'
-  );
+  const why = JWT_SECRET
+    ? 'JWT_SECRET masih nilai default. Ganti string acak di Railway Variables, lalu Redeploy.'
+    : 'JWT_SECRET kosong di container. Isi di service Variables (bukan hanya Shared), lalu klik Deploy.';
+  throw new Error(why);
 }
 
 const SIGNING_SECRET = JWT_SECRET || 'lamarkerja_dev_only_jwt_secret';

@@ -1,11 +1,9 @@
 /**
  * Entry server: hubungkan PostgreSQL lalu listen di PORT.
  */
-import dotenv from 'dotenv';
+import './loadEnv.js';
 import { createApp } from './app.js';
 import { connectDB } from './config/database.js';
-
-dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 const app = createApp();

@@ -154,14 +154,14 @@ Skip AWS for this app. Railway runs a real Node process (job sync can take minut
 
 Railway injects `PORT`. Leave `VITE_API_URL` empty so the SPA calls same-origin `/api`.
 
-4. **Volume** (wajib kalau Root Directory = `server`):
+4. **Root Directory:** biarkan **kosong** (repo root), jangan `server`. Script `build` ada di `package.json` root. Kalau Root = `server`, Railway menjalankan `npm run build` di folder API dan build gagal (atau UI tidak ikut).
+5. **Volume:**
    - Railway → service → **Volumes** → Add
-   - **Mount path:** `/app/uploads`  
-     (itu folder `server/uploads` di dalam container; Multer menulis CV ke situ)
-   - Optional variable: `UPLOAD_DIR=/app/uploads` (sama dengan default)
+   - **Mount path:** `/app/uploads`
+   - Variable: `UPLOAD_DIR=/app/uploads`
    - Tanpa volume, file CV hilang setiap redeploy
 
-Kalau Root Directory = `server`, folder `client/` **tidak ikut**. SPA harus di Vercel (`VITE_API_URL` = URL Railway) **atau** ganti Root ke repo (bukan `server`) supaya UI ikut di-build.
+Kalau kamu tetap memakai Root Directory = `server`, SPA harus di Vercel (`VITE_API_URL` = URL Railway).
 5. Generate a public domain. Health check is `GET /api/health`.
 6. First register on that URL is **admin**.
 

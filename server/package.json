@@ -5,8 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js",
+    "start": "node --import ./loadEnv.js server.js",
+    "dev": "node --watch --import ./loadEnv.js server.js",
+    "build": "node -e \"console.log('server: no compile step')\"",
     "test": "node --test helpers/*.test.js services/*.test.js config/*.test.js"
   },
   "dependencies": {
