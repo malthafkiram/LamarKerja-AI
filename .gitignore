@@ -6,6 +6,7 @@ uploads/
 .env
 server/.env
 client/.env
+*.pem
 *.local
 .DS_Store
 npm-debug.log*

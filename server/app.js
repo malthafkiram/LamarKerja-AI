@@ -34,6 +34,7 @@ export function createApp() {
   app.use(express.urlencoded({ extended: true, limit: '25mb' }));
 
   ensureUploadDirs();
+  app.set('trust proxy', 1);
   app.use('/uploads', express.static(uploadBase));
   app.use('/api', apiRouter);
 

@@ -2,6 +2,7 @@ module.exports = {
   apps: [
     {
       name: 'lamarkerja-api',
+      cwd: __dirname,
       script: 'server.js',
       instances: 1,
       exec_mode: 'fork',

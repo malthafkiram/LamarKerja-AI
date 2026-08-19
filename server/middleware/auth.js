@@ -4,12 +4,26 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'lamarkerja_super_secret_jwt_key_2026';
+const INSECURE_DEFAULTS = new Set([
+  '',
+  'ganti_dengan_secret_acak',
+  'lamarkerja_super_secret_jwt_key_2026'
+]);
+
+const JWT_SECRET = process.env.JWT_SECRET || '';
+
+if (process.env.NODE_ENV === 'production' && INSECURE_DEFAULTS.has(JWT_SECRET)) {
+  throw new Error(
+    'JWT_SECRET wajib diisi string acak di production. Jangan pakai default.'
+  );
+}
+
+const SIGNING_SECRET = JWT_SECRET || 'lamarkerja_dev_only_jwt_secret';
 
 export function generateToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role, name: user.name },
-    JWT_SECRET,
+    SIGNING_SECRET,
     { expiresIn: '30d' }
   );
 }
@@ -36,7 +50,7 @@ export async function requireAuth(req, res, next) {
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, SIGNING_SECRET);
     const user = await loadUserById(decoded.id);
     if (!user) {
       return res.status(401).json({ success: false, error: 'Sesi pengguna tidak valid atau akun telah dihapus.' });
@@ -62,7 +76,7 @@ export async function optionalAuth(req, res, next) {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, JWT_SECRET);
+      const decoded = jwt.verify(token, SIGNING_SECRET);
       const user = await loadUserById(decoded.id);
       if (user) {
         await downgradeExpiredPlan(user);
