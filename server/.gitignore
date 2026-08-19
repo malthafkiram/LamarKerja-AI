@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# Uploads live on disk (EC2); not in git
+uploads/
+../uploads/
+
+# Logs & OS
+logs/
+*.log
+.DS_Store
+npm-debug.log*
