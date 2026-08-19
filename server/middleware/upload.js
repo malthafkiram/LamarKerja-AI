@@ -9,7 +9,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export const uploadBase = path.join(__dirname, '..', '..', 'uploads');
+/**
+ * Railway Root Directory = `server` → cwd is /app, files go to /app/uploads.
+ * Local monorepo → server/uploads. Override with UPLOAD_DIR if you mount a volume elsewhere.
+ */
+export const uploadBase = process.env.UPLOAD_DIR
+  ? path.resolve(process.env.UPLOAD_DIR)
+  : path.join(__dirname, '..', 'uploads');
 export const flyersDir = path.join(uploadBase, 'flyers');
 export const cvsDir = path.join(uploadBase, 'cvs');
 export const othersDir = path.join(uploadBase, 'others');
