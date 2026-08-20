@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '../context/LanguageContext';
-import { normalizeAppPassword, pickSmtpFields } from '../utils/smtpConfig';
+import { normalizeAppPassword, pickSmtpFields, formatSmtpTestError, gmailSmtpGuard, isGoogleAppPassword } from '../utils/smtpConfig';
 
 export default function SettingsModal({ 
   isOpen, 
@@ -198,8 +198,10 @@ export default function SettingsModal({
   const handleTestSmtp = async () => {
     const smtp_user = String(formData.smtp_user || '').trim();
     const smtp_pass = normalizeAppPassword(formData.smtp_pass);
-    if (!smtp_user || !smtp_pass) {
-      setErrorMessage(lang === 'id' ? 'Harap isi Alamat Email Gmail dan App Password terlebih dahulu.' : 'Please fill in Gmail Address and App Password first.');
+    const guard = gmailSmtpGuard(smtp_user, smtp_pass);
+    if (guard) {
+      setErrorMessage(guard);
+      setTestResult({ success: false, error: guard });
       return;
     }
 
@@ -225,7 +227,7 @@ export default function SettingsModal({
         } catch {}
       }
     } catch (err) {
-      setTestResult({ success: false, error: err.message });
+      setTestResult({ success: false, error: formatSmtpTestError(err) });
     } finally {
       setIsTestingSmtp(false);
     }
@@ -237,6 +239,12 @@ export default function SettingsModal({
     setSaveSuccess(false);
 
     const smtpFields = pickSmtpFields(formData);
+    const guard = gmailSmtpGuard(smtpFields.smtp_user, smtpFields.smtp_pass);
+    if (guard) {
+      setErrorMessage(guard);
+      setIsSaving(false);
+      return;
+    }
     if (smtpFields.smtp_pass) {
       handleChange('smtp_pass', smtpFields.smtp_pass);
     }
@@ -685,6 +693,8 @@ export default function SettingsModal({
               type="email"
               className="input-field"
               placeholder="contoh: namaanda@gmail.com"
+              autoComplete="off"
+              name="lamarkerja-smtp-user"
               value={formData.smtp_user}
               onChange={(e) => handleChange('smtp_user', e.target.value)}
             />
@@ -697,10 +707,19 @@ export default function SettingsModal({
             <input
               type="password"
               className="input-field"
-              placeholder="abcd efgh ijkl mnop (tanpa spasi)"
+              placeholder="abcd efgh ijkl mnop"
+              autoComplete="new-password"
+              name="lamarkerja-smtp-app-password"
+              spellCheck={false}
               value={formData.smtp_pass}
               onChange={(e) => handleChange('smtp_pass', e.target.value)}
             />
+            <p style={{ fontSize: '0.72rem', color: isGoogleAppPassword(formData.smtp_pass) ? '#34D399' : '#FBBF24', margin: '4px 0 0' }}>
+              {normalizeAppPassword(formData.smtp_pass).length}/16
+              {lang === 'id'
+                ? ' huruf App Password (bukan password Gmail). Hapus isian lama, buat baru di myaccount.google.com/apppasswords, tempel 16 huruf itu.'
+                : ' App Password letters (not your Gmail login). Clear this field, create a new App Password, paste the 16 letters.'}
+            </p>
           </div>
 
           {/* Test SMTP Feedback */}

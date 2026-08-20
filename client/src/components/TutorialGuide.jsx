@@ -33,7 +33,18 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
       ]
     },
     {
-      title: "2. Error: 'Teks pada gambar brosur tidak dapat terbaca oleh OCR'",
+      title: "2. Error: 'NetworkError when attempting to fetch resource' (hanya di situs live)",
+      badge: "Railway SMTP",
+      cause: "Paket Railway Hobby/Trial memblokir keluar ke smtp.gmail.com port 465/587. Request Uji SMTP menggantung sampai proxy memutus, jadi browser menampilkan NetworkError. Di komputer lokal port SMTP terbuka, jadi yang muncul adalah error Gmail 535 (password salah).",
+      solution: [
+        "Perbaiki App Password dulu di aplikasi lokal sampai Uji Koneksi berhasil (bukan 535).",
+        "Untuk kirim dari https://lamarkerja.kabanroom.web.id: upgrade Railway ke Pro, lalu redeploy service-nya.",
+        "Atau ganti pengiriman ke layanan email HTTPS (Resend, SendGrid, Mailgun) — tidak memakai port SMTP.",
+        "Hard refresh sekali setelah deploy agar service worker lama tidak menahan halaman."
+      ]
+    },
+    {
+      title: "3. Error: 'Teks pada gambar brosur tidak dapat terbaca oleh OCR'",
       badge: "Scanner OCR",
       cause: "Gambar poster/brosur terlalu buram, resolusi terlalu kecil, teks tertutup ornamen grafis tebal, atau kontras warna font terlalu redup.",
       solution: [
@@ -44,7 +55,7 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
       ]
     },
     {
-      title: "3. Error: 'Batas pengiriman email harian (30 email/hari) telah tercapai'",
+      title: "4. Error: 'Batas pengiriman email harian (30 email/hari) telah tercapai'",
       badge: "Anti-Spam",
       cause: "Sistem mengaktifkan pengaman anti-spam harian untuk menjaga reputasi akun Gmail Anda agar tidak dicap sebagai spammer oleh Google.",
       solution: [
@@ -53,7 +64,7 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
       ]
     },
     {
-      title: "4. Error: 'Email tujuan HRD tidak terdeteksi pada brosur'",
+      title: "5. Error: 'Email tujuan HRD tidak terdeteksi pada brosur'",
       badge: "Ekstraksi AI",
       cause: "Poster lowongan tidak mencantumkan email penerimaan (misalnya hanya mencantumkan link website form Google / portal karir internal).",
       solution: [
@@ -62,7 +73,7 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
       ]
     },
     {
-      title: "5. Error: 'Gagal terhubung ke PostgreSQL / Sequelize Connection Timeout'",
+      title: "6. Error: 'Gagal terhubung ke PostgreSQL / Sequelize Connection Timeout'",
       badge: "Database",
       cause: "PostgreSQL di mesin Anda belum berjalan, DATABASE_URL salah, atau jaringan ke host database terputus. LamarKerja memakai PostgreSQL lokal/self-hosted, bukan MongoDB Atlas.",
       solution: [
@@ -85,7 +96,18 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
       ]
     },
     {
-      title: "2. Error: 'Text on job flyer unreadable by OCR engine'",
+      title: "2. Error: 'NetworkError when attempting to fetch resource' (live site only)",
+      badge: "Railway SMTP",
+      cause: "Railway Hobby/Trial blocks outbound SMTP to smtp.gmail.com on ports 465/587. The test request hangs until the proxy drops it, so the browser shows NetworkError. On your laptop SMTP is open, so you see Gmail's 535 instead.",
+      solution: [
+        "Fix the App Password locally until Test SMTP succeeds (not 535).",
+        "To send from the live site: upgrade Railway to Pro, then redeploy.",
+        "Or send through an HTTPS email API (Resend, SendGrid, Mailgun) instead of Gmail SMTP.",
+        "Hard-refresh once after deploy so an old service worker does not keep a stale page."
+      ]
+    },
+    {
+      title: "3. Error: 'Text on job flyer unreadable by OCR engine'",
       badge: "Scanner OCR",
       cause: "The flyer image is too blurry, resolution is low, or text contrast is inadequate.",
       solution: [
@@ -96,7 +118,7 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
       ]
     },
     {
-      title: "3. Error: 'Daily application delivery limit reached'",
+      title: "4. Error: 'Daily application delivery limit reached'",
       badge: "Anti-Spam",
       cause: "Daily anti-spam protection is engaged to protect your personal Gmail domain reputation.",
       solution: [
@@ -105,7 +127,7 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
       ]
     },
     {
-      title: "4. Error: 'Recipient HR email not detected on flyer'",
+      title: "5. Error: 'Recipient HR email not detected on flyer'",
       badge: "AI Extraction",
       cause: "The poster only contains website application links or internal Google forms.",
       solution: [
@@ -114,7 +136,7 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
       ]
     },
     {
-      title: "5. Error: 'Failed to connect to PostgreSQL / Sequelize Connection Timeout'",
+      title: "6. Error: 'Failed to connect to PostgreSQL / Sequelize Connection Timeout'",
       badge: "Database",
       cause: "PostgreSQL on this machine is down, DATABASE_URL is wrong, or the database host is unreachable. LamarKerja uses local/self-hosted PostgreSQL, not MongoDB Atlas.",
       solution: [

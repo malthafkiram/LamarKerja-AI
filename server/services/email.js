@@ -5,16 +5,18 @@ import { Op } from 'sequelize';
 import { getSettings, logAction } from '../helpers/dbHelpers.js';
 import { Application, User } from '../models/index.js';
 import { effectiveSendLimit } from '../helpers/quota.js';
+import { describeSmtpError, SMTP_CONNECT_TIMEOUT_MS } from '../helpers/smtpError.js';
+import { gmailSmtpGuard, normalizeAppPassword } from '../helpers/smtpAuth.js';
 
 /**
  * Create Nodemailer Transporter based on personal or system settings
  */
 export function getMailTransporter(smtpConfig) {
   const user = smtpConfig.smtp_user ? smtpConfig.smtp_user.trim() : '';
-  const pass = smtpConfig.smtp_pass ? smtpConfig.smtp_pass.trim() : '';
-
-  if (!user || !pass) {
-    throw new Error('Konfigurasi SMTP Gmail belum lengkap. Silakan masukkan Alamat Gmail dan Google App Password di menu Pengaturan.');
+  const pass = normalizeAppPassword(smtpConfig.smtp_pass);
+  const invalid = gmailSmtpGuard(user, pass);
+  if (invalid) {
+    throw new Error(invalid);
   }
 
   const port = parseInt(smtpConfig.smtp_port, 10) || 465;
@@ -28,7 +30,10 @@ export function getMailTransporter(smtpConfig) {
     host: smtpConfig.smtp_host || 'smtp.gmail.com',
     port,
     secure,
-    auth: { user, pass }
+    auth: { user, pass },
+    connectionTimeout: SMTP_CONNECT_TIMEOUT_MS,
+    greetingTimeout: SMTP_CONNECT_TIMEOUT_MS,
+    socketTimeout: SMTP_CONNECT_TIMEOUT_MS
   });
 }
 
@@ -124,16 +129,20 @@ export async function sendApplicationEmail({
     attachments: mailAttachments
   };
 
-  const info = await transporter.sendMail(mailOptions);
+  try {
+    const info = await transporter.sendMail(mailOptions);
 
-  await logAction('EMAIL_SENT', `Email lamaran terkirim ke ${recipientEmail} (${fromAddress})`, {
-    messageId: info.messageId,
-    subject,
-    attachmentsCount: mailAttachments.length,
-    userId
-  });
+    await logAction('EMAIL_SENT', `Email lamaran terkirim ke ${recipientEmail} (${fromAddress})`, {
+      messageId: info.messageId,
+      subject,
+      attachmentsCount: mailAttachments.length,
+      userId
+    });
 
-  return info;
+    return info;
+  } catch (err) {
+    throw new Error(describeSmtpError(err));
+  }
 }
 
 /**
@@ -141,6 +150,10 @@ export async function sendApplicationEmail({
  */
 export async function verifySmtp(smtpConfig) {
   const transporter = getMailTransporter(smtpConfig);
-  await transporter.verify();
+  try {
+    await transporter.verify();
+  } catch (err) {
+    throw new Error(describeSmtpError(err));
+  }
   return { success: true, message: '✓ Koneksi Gmail SMTP Berhasil Terhubung!' };
 }
