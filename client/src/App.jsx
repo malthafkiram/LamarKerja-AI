@@ -25,6 +25,9 @@ import PlanStatusBanner from "./components/PlanStatusBanner";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import useSocialProof from "./hooks/useSocialProof";
 import { pickSmtpFields } from "./utils/smtpConfig";
+import { fetchWithTimeout } from "./utils/fetchWithTimeout";
+
+const BOOT_FETCH_MS = 8000;
 
 function AppContent() {
   const { t, lang } = useLanguage();
@@ -115,9 +118,11 @@ function AppContent() {
           setCurrentUser(userObj);
 
           // Verify token
-          const meRes = await fetch("/api/auth/me", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const meRes = await fetchWithTimeout(
+            "/api/auth/me",
+            { headers: { Authorization: `Bearer ${token}` } },
+            BOOT_FETCH_MS,
+          );
           const meData = await meRes.json();
           if (meData.success) {
             persistUser(meData.user);
@@ -143,24 +148,38 @@ function AppContent() {
       const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
       // 1. Fetch Settings
-      const resSettings = await fetch("/api/settings", { headers: authHeaders });
+      const resSettings = await fetchWithTimeout(
+        "/api/settings",
+        { headers: authHeaders },
+        BOOT_FETCH_MS,
+      );
       const dataSettings = await resSettings.json();
       if (dataSettings.success) setSettings(dataSettings.settings);
 
       // 2. Fetch Profile
-      const resProfile = await fetch("/api/profile", { headers: authHeaders });
+      const resProfile = await fetchWithTimeout(
+        "/api/profile",
+        { headers: authHeaders },
+        BOOT_FETCH_MS,
+      );
       const dataProfile = await resProfile.json();
       if (dataProfile.success) setProfile(dataProfile.profile);
 
       // 3. Fetch Applications Stats & Inbox if logged in
       if (token) {
-        const meRes = await fetch("/api/auth/me", { headers: authHeaders });
+        const meRes = await fetchWithTimeout(
+          "/api/auth/me",
+          { headers: authHeaders },
+          BOOT_FETCH_MS,
+        );
         const meData = await meRes.json();
         if (meData.success) persistUser(meData.user);
 
-        const resApps = await fetch("/api/applications", {
-          headers: authHeaders,
-        });
+        const resApps = await fetchWithTimeout(
+          "/api/applications",
+          { headers: authHeaders },
+          BOOT_FETCH_MS,
+        );
         const dataApps = await resApps.json();
         if (dataApps.success) setStats(dataApps.stats);
         await fetchInboxCount();

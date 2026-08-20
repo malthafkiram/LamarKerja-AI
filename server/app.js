@@ -8,6 +8,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import apiRouter from './routes/index.js';
 import { ensureUploadDirs, uploadBase } from './middleware/upload.js';
+import { cacheControlForStaticFile } from './helpers/staticCache.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,9 +41,17 @@ export function createApp() {
 
   const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
   if (fs.existsSync(clientDistPath)) {
-    app.use(express.static(clientDistPath));
+    app.use(
+      express.static(clientDistPath, {
+        setHeaders(res, filePath) {
+          const value = cacheControlForStaticFile(filePath);
+          if (value) res.setHeader('Cache-Control', value);
+        }
+      })
+    );
     app.get('*', (req, res, next) => {
       if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
       res.sendFile(path.join(clientDistPath, 'index.html'));
     });
   }
