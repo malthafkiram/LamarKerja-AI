@@ -39,6 +39,7 @@ export default function CVGenerator({
   onProfileUpdated,
   onOpenUpgradePro,
   onOpenAuth,
+  onUserUpdated,
 }) {
   const { lang, t } = useLanguage();
   const cvSheetRef = useRef(null);
@@ -173,6 +174,14 @@ export default function CVGenerator({
 
   // 1-Click AI Transformation Handler
   const handleGenerateCV = async () => {
+    if (!currentUser) {
+      if (onOpenAuth) onOpenAuth();
+      return;
+    }
+    if (isExhausted) {
+      if (onOpenUpgradePro) onOpenUpgradePro();
+      return;
+    }
     if (!targetRole.trim()) {
       alert("Silakan isi Posisi Target yang Anda tuju terlebih dahulu.");
       return;
@@ -211,6 +220,9 @@ export default function CVGenerator({
       }
 
       setRefinedCV(data.cv);
+      if (typeof data.usage === "number" && onUserUpdated) {
+        onUserUpdated({ ...currentUser, cv_builder_usage: data.usage });
+      }
       if (onProfileUpdated) onProfileUpdated();
 
       try {

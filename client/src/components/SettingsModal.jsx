@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useLanguage } from '../context/LanguageContext';
+import { normalizeAppPassword, pickSmtpFields } from '../utils/smtpConfig';
 
 export default function SettingsModal({ 
   isOpen, 
@@ -14,13 +15,13 @@ export default function SettingsModal({
   settings, 
   currentUser, 
   onSettingsUpdated,
+  onSmtpSaved,
+  onUserUpdated,
   onLogout,
   onOpenAuth,
   deferredPrompt,
   onInstallApp
 }) {
-  if (!isOpen) return null;
-
   const { lang, setLanguage, t } = useLanguage();
   const isAdmin = currentUser?.role === 'admin';
 
@@ -96,10 +97,11 @@ export default function SettingsModal({
   };
 
   useEffect(() => {
+    if (!isOpen) return;
     if (currentUser?.role === 'admin') {
       fetchAdminUsers();
     }
-  }, [currentUser]);
+  }, [isOpen, currentUser]);
 
   const handleAdminUpgradeUser = async (userId, plan, durationDays, role) => {
     setUpgradingUserId(userId);
@@ -119,6 +121,9 @@ export default function SettingsModal({
           confetti({ particleCount: 35, spread: 60, origin: { y: 0.6 } });
         } catch {}
         fetchAdminUsers();
+        if (onUserUpdated && data.user && String(data.user.id) === String(currentUser?.id)) {
+          onUserUpdated({ ...currentUser, ...data.user });
+        }
       }
     } catch (err) {
       console.error(err);
@@ -153,8 +158,9 @@ export default function SettingsModal({
 
   // Load user's personal profile SMTP settings
   useEffect(() => {
+    if (!isOpen) return;
     loadUserSmtp();
-  }, [currentUser]);
+  }, [isOpen, currentUser]);
 
   const loadUserSmtp = async () => {
     try {
@@ -190,7 +196,9 @@ export default function SettingsModal({
   };
 
   const handleTestSmtp = async () => {
-    if (!formData.smtp_user || !formData.smtp_pass) {
+    const smtp_user = String(formData.smtp_user || '').trim();
+    const smtp_pass = normalizeAppPassword(formData.smtp_pass);
+    if (!smtp_user || !smtp_pass) {
       setErrorMessage(lang === 'id' ? 'Harap isi Alamat Email Gmail dan App Password terlebih dahulu.' : 'Please fill in Gmail Address and App Password first.');
       return;
     }
@@ -204,8 +212,8 @@ export default function SettingsModal({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          smtp_user: formData.smtp_user,
-          smtp_pass: formData.smtp_pass
+          smtp_user,
+          smtp_pass
         })
       });
 
@@ -228,6 +236,11 @@ export default function SettingsModal({
     setErrorMessage(null);
     setSaveSuccess(false);
 
+    const smtpFields = pickSmtpFields(formData);
+    if (smtpFields.smtp_pass) {
+      handleChange('smtp_pass', smtpFields.smtp_pass);
+    }
+
     try {
       const token = localStorage.getItem('lamarkerja_token');
       if (token) {
@@ -237,23 +250,19 @@ export default function SettingsModal({
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({
-            smtp_user: formData.smtp_user,
-            smtp_pass: formData.smtp_pass,
-            sender_name: formData.sender_name
-          })
+          body: JSON.stringify(smtpFields)
         });
         const data = await res.json();
         if (data.success) {
           setSaveSuccess(true);
-          if (onSettingsUpdated) onSettingsUpdated(formData);
+          if (onSmtpSaved) onSmtpSaved(smtpFields);
           setTimeout(() => setSaveSuccess(false), 3000);
         } else {
           setErrorMessage(data.error || 'Gagal menyimpan pengaturan.');
         }
       } else {
         setSaveSuccess(true);
-        if (onSettingsUpdated) onSettingsUpdated(formData);
+        if (onSmtpSaved) onSmtpSaved(smtpFields);
         setTimeout(() => setSaveSuccess(false), 3000);
       }
     } catch (err) {
@@ -324,6 +333,8 @@ export default function SettingsModal({
 
   const userDisplayName = currentUser?.full_name || currentUser?.name || currentUser?.email?.split('@')[0] || 'User';
   const userInitial = userDisplayName.charAt(0).toUpperCase();
+
+  if (!isOpen) return null;
 
   return (
     <div style={{
@@ -418,8 +429,14 @@ export default function SettingsModal({
                   <div style={{ fontSize: '0.78rem', color: '#94A3B8' }}>
                     {currentUser.email}
                   </div>
-                  <span className="badge badge-emerald" style={{ fontSize: '0.62rem', marginTop: '3px' }}>
-                    {currentUser.role === 'admin' ? 'Administrator' : 'Job Seeker PRO'}
+                  <span className={`badge ${currentUser.plan === 'vip' ? 'badge-amber' : currentUser.plan === 'pro' ? 'badge-emerald' : 'badge-cyan'}`} style={{ fontSize: '0.62rem', marginTop: '3px' }}>
+                    {currentUser.role === 'admin'
+                      ? 'Administrator'
+                      : currentUser.plan === 'vip'
+                        ? 'VIP'
+                        : currentUser.plan === 'pro'
+                          ? 'PRO'
+                          : (lang === 'id' ? 'Gratis' : 'Free')}
                   </span>
                 </div>
               </div>
@@ -736,7 +753,7 @@ export default function SettingsModal({
             <button
               type="button"
               onClick={handleTestSmtp}
-              disabled={isTestingSmtp || !formData.smtp_user || !formData.smtp_pass}
+              disabled={isTestingSmtp}
               className="btn-secondary"
               style={{ flex: 1, padding: '9px', fontSize: '0.82rem' }}
             >

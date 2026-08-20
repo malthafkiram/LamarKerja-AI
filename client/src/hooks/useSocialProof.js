@@ -2,6 +2,32 @@ import { useEffect, useState } from 'react';
 
 const EMPTY = { visitors: 0, registered: 0 };
 
+let bootstrapPromise = null;
+
+async function fetchStatsJson() {
+  const res = await fetch('/api/stats', { credentials: 'include' });
+  return res.json();
+}
+
+/**
+ * One shared bootstrap so React StrictMode cannot fire two cookie-less
+ * GET /api/stats in parallel. First response sets lk_vid; second persists
+ * exactly one visitor row.
+ */
+function bootstrapStats() {
+  if (!bootstrapPromise) {
+    bootstrapPromise = (async () => {
+      const first = await fetchStatsJson();
+      const second = await fetchStatsJson();
+      return second?.success ? second : first;
+    })().catch((err) => {
+      bootstrapPromise = null;
+      throw err;
+    });
+  }
+  return bootstrapPromise;
+}
+
 export default function useSocialProof() {
   const [counts, setCounts] = useState(EMPTY);
   const [live, setLive] = useState(false);
@@ -22,8 +48,7 @@ export default function useSocialProof() {
     };
 
     const fetchCounts = async () => {
-      const res = await fetch('/api/stats', { credentials: 'include' });
-      const data = await res.json();
+      const data = await fetchStatsJson();
       if (data.success) apply(data);
     };
 
@@ -65,7 +90,10 @@ export default function useSocialProof() {
       };
     };
 
-    fetchCounts()
+    bootstrapStats()
+      .then((data) => {
+        if (data?.success) apply(data);
+      })
       .catch(() => {})
       .finally(() => {
         if (!cancelled) startSse();

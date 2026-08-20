@@ -3,8 +3,6 @@ import { Mail, Clock, Send, CheckCircle2, AlertCircle, Sparkles, RefreshCw, X } 
 import confetti from 'canvas-confetti';
 
 export default function FollowUpModal({ isOpen, onClose, application, onFollowUpSent }) {
-  if (!isOpen || !application) return null;
-
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [draft, setDraft] = useState({ subject: '', body: '', body_html: '' });
@@ -12,8 +10,9 @@ export default function FollowUpModal({ isOpen, onClose, application, onFollowUp
   const [successMsg, setSuccessMsg] = useState(null);
 
   useEffect(() => {
+    if (!isOpen || !application) return;
     fetchDraft();
-  }, [application]);
+  }, [isOpen, application]);
 
   const fetchDraft = async () => {
     setIsLoading(true);
@@ -82,6 +81,8 @@ export default function FollowUpModal({ isOpen, onClose, application, onFollowUp
       setIsSending(false);
     }
   };
+
+  if (!isOpen || !application) return null;
 
   return (
     <div style={{

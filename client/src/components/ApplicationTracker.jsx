@@ -7,6 +7,7 @@ import FollowUpModal from './FollowUpModal';
 import InterviewSimulatorModal from './InterviewSimulatorModal';
 import LoadingOverlay from './LoadingOverlay';
 import { useLanguage } from '../context/LanguageContext';
+import { effectiveSendLimit } from '../utils/planStatus';
 
 const APPLICATION_SOURCES = [
   'Glints',
@@ -46,7 +47,7 @@ function authJsonHeaders() {
   };
 }
 
-export default function ApplicationTracker({ stats, onRefresh }) {
+export default function ApplicationTracker({ stats, onRefresh, currentUser, settings }) {
   const { t, lang } = useLanguage();
   const [applications, setApplications] = useState([]);
   const [filterStatus, setFilterStatus] = useState('all');
@@ -236,6 +237,7 @@ export default function ApplicationTracker({ stats, onRefresh }) {
 
   const fieldLabel = { fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '6px', display: 'block' };
   const displayStats = listStats || stats || {};
+  const sendLimit = effectiveSendLimit(settings?.daily_limit, currentUser?.bonus_quota);
   const followUpDue = applications.filter((app) => app.needs_follow_up);
   const pipelineStages = [
     { id: 'draft', label: 'Draft', count: applications.filter((a) => a.status === 'draft').length, color: '#FBBF24' },
@@ -300,7 +302,7 @@ export default function ApplicationTracker({ stats, onRefresh }) {
           </div>
           <div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{lang === 'id' ? 'Terkirim Hari Ini' : 'Sent Today'}</div>
-            <div style={{ fontSize: '1.6rem', fontWeight: 800 }}>{displayStats.sent_today || 0} / 30</div>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800 }}>{displayStats.sent_today || 0} / {sendLimit}</div>
           </div>
         </div>
 

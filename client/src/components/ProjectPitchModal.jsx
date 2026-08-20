@@ -6,8 +6,6 @@ import {
 import confetti from 'canvas-confetti';
 
 export default function ProjectPitchModal({ isOpen, onClose, defaultProject = null }) {
-  if (!isOpen) return null;
-
   const [projectName, setProjectName] = useState(defaultProject?.name || '');
   const [techStack, setTechStack] = useState(defaultProject?.techStack || '');
   const [description, setDescription] = useState(defaultProject?.description || '');
@@ -55,6 +53,8 @@ export default function ProjectPitchModal({ isOpen, onClose, defaultProject = nu
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 1800);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

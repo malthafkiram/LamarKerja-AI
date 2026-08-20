@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, HelpCircle, CheckCircle2, MessageSquare, RefreshCw, X, ShieldAlert, Sparkles } from 'lucide-react';
 
 export default function SalaryInsightModal({ isOpen, onClose, defaultPosition, defaultLocation }) {
-  if (!isOpen) return null;
-
   const [position, setPosition] = useState(defaultPosition || '');
   const [location, setLocation] = useState(defaultLocation || '');
   const [experienceLevel, setExperienceLevel] = useState('');
@@ -12,8 +10,8 @@ export default function SalaryInsightModal({ isOpen, onClose, defaultPosition, d
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (defaultPosition) fetchInsight();
-  }, []);
+    if (isOpen && defaultPosition) fetchInsight();
+  }, [isOpen, defaultPosition]);
 
   const fetchInsight = async () => {
     setIsLoading(true);
@@ -42,6 +40,8 @@ export default function SalaryInsightModal({ isOpen, onClose, defaultPosition, d
       setIsLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

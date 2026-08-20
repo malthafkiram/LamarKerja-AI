@@ -58,15 +58,18 @@ export async function streamStats(req, res) {
     if (typeof res.flushHeaders === 'function') res.flushHeaders();
 
     const cookieId = parseCookieValue(req.headers.cookie, VISITOR_COOKIE);
-    if (isValidVisitorId(cookieId)) {
-      await touchLiveVisitor({
-        visitorId: cookieId,
-        userAgent: req.get('user-agent')
-      }).catch(() => {});
-    }
+    const touched = isValidVisitorId(cookieId)
+      ? await touchLiveVisitor({
+          visitorId: cookieId,
+          userAgent: req.get('user-agent')
+        }).catch(() => null)
+      : null;
 
     const counts = await getSocialProofCounts();
     res.write(formatSseEvent('stats', counts));
+    if (touched?.isNew) {
+      getSocialProofHub().broadcast(counts);
+    }
 
     const hub = getSocialProofHub();
     hub.add(res);

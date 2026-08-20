@@ -7,8 +7,6 @@ import { useState } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function ContactModal({ isOpen, onClose }) {
-  if (!isOpen) return null;
-
   const { lang } = useLanguage();
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
@@ -38,6 +36,8 @@ export default function ContactModal({ isOpen, onClose }) {
     const query = encodeURIComponent('Jl. Dwijaya 4 No. 13, Kebayoran Lama, Jakarta Selatan');
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

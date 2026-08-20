@@ -7,8 +7,6 @@ import confetti from 'canvas-confetti';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function UpgradeProModal({ isOpen, onClose, currentUser }) {
-  if (!isOpen) return null;
-
   const { lang, t } = useLanguage();
   const [selectedPlan, setSelectedPlan] = useState('pro'); // 'topup', 'pro', 'vip'
   const [paymentMethodTab, setPaymentMethodTab] = useState('qris'); // 'qris' | 'manual'
@@ -97,6 +95,8 @@ export default function UpgradeProModal({ isOpen, onClose, currentUser }) {
     );
     window.open(`https://wa.me/6285157715522?text=${message}`, '_blank');
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

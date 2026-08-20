@@ -21,8 +21,10 @@ import UpgradeProModal from "./components/UpgradeProModal";
 import LoadingOverlay from "./components/LoadingOverlay";
 import BrandLogo from "./components/BrandLogo";
 import SocialProofStats from "./components/SocialProofStats";
+import PlanStatusBanner from "./components/PlanStatusBanner";
 import { LanguageProvider, useLanguage } from "./context/LanguageContext";
 import useSocialProof from "./hooks/useSocialProof";
+import { pickSmtpFields } from "./utils/smtpConfig";
 
 function AppContent() {
   const { t, lang } = useLanguage();
@@ -79,6 +81,15 @@ function AppContent() {
     initAuthAndData();
   }, []);
 
+  const persistUser = (user) => {
+    if (!user) return;
+    setCurrentUser((prev) => {
+      const next = { ...(prev || {}), ...user };
+      localStorage.setItem("lamarkerja_user", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const fetchInboxCount = async () => {
     try {
       const token = localStorage.getItem("lamarkerja_token");
@@ -109,11 +120,7 @@ function AppContent() {
           });
           const meData = await meRes.json();
           if (meData.success) {
-            setCurrentUser(meData.user);
-            localStorage.setItem(
-              "lamarkerja_user",
-              JSON.stringify(meData.user),
-            );
+            persistUser(meData.user);
           } else {
             handleLogout();
           }
@@ -136,7 +143,7 @@ function AppContent() {
       const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
 
       // 1. Fetch Settings
-      const resSettings = await fetch("/api/settings");
+      const resSettings = await fetch("/api/settings", { headers: authHeaders });
       const dataSettings = await resSettings.json();
       if (dataSettings.success) setSettings(dataSettings.settings);
 
@@ -147,6 +154,10 @@ function AppContent() {
 
       // 3. Fetch Applications Stats & Inbox if logged in
       if (token) {
+        const meRes = await fetch("/api/auth/me", { headers: authHeaders });
+        const meData = await meRes.json();
+        if (meData.success) persistUser(meData.user);
+
         const resApps = await fetch("/api/applications", {
           headers: authHeaders,
         });
@@ -160,7 +171,7 @@ function AppContent() {
   };
 
   const handleAuthSuccess = (user, token) => {
-    setCurrentUser(user);
+    persistUser(user);
     loadInitialData();
     fetchInboxCount();
   };
@@ -218,6 +229,18 @@ function AppContent() {
         unreadInboxCount={unreadInboxCount}
       />
 
+      {currentUser && (
+        <div style={{ maxWidth: "1440px", width: "100%", margin: "0 auto", padding: "0 20px" }}>
+          <PlanStatusBanner
+            currentUser={currentUser}
+            stats={stats}
+            settings={settings}
+            lang={lang}
+            onOpenUpgradePro={() => setIsUpgradeProOpen(true)}
+          />
+        </div>
+      )}
+
       {/* Main Content Area */}
       <main
         style={{
@@ -245,6 +268,7 @@ function AppContent() {
             onProfileUpdated={loadInitialData}
             onOpenUpgradePro={() => setIsUpgradeProOpen(true)}
             onOpenAuth={() => setIsAuthModalOpen(true)}
+            onUserUpdated={persistUser}
           />
         )}
 
@@ -293,6 +317,7 @@ function AppContent() {
             <ApplicationTracker
               stats={stats}
               currentUser={currentUser}
+              settings={settings}
               onRefresh={refreshStats}
             />
           ) : (
@@ -350,11 +375,23 @@ function AppContent() {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         currentUser={currentUser}
-        onSettingsUpdated={(updated) => setSettings(updated)}
+        onSmtpSaved={(smtp) => {
+          const fields = pickSmtpFields(smtp);
+          setProfile((prev) => ({ ...prev, ...fields }));
+          setSettings((prev) => ({ ...prev, ...fields }));
+        }}
+        onSettingsUpdated={(updated) => {
+          const next = { ...(updated || {}) };
+          delete next.smtp_user;
+          delete next.smtp_pass;
+          delete next.sender_name;
+          setSettings((prev) => ({ ...prev, ...next }));
+        }}
         onLogout={handleLogout}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         deferredPrompt={deferredPrompt}
         onInstallApp={() => setIsInstallOpen(true)}
+        onUserUpdated={persistUser}
       />
 
       {/* Auth Modal (Login / Register) */}
@@ -372,7 +409,7 @@ function AppContent() {
         isOpen={isInboxOpen}
         onClose={() => setIsInboxOpen(false)}
         currentUser={currentUser}
-        onStartInterview={(job) => setInterviewJobForModal(job)}
+        onLaunchInterview={(job) => setInterviewJobForModal(job)}
         onInboxUpdated={fetchInboxCount}
       />
 

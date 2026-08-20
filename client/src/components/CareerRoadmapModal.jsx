@@ -6,15 +6,14 @@ import {
 import confetti from 'canvas-confetti';
 
 export default function CareerRoadmapModal({ isOpen, onClose, profile }) {
-  if (!isOpen) return null;
-
   const [isLoading, setIsLoading] = useState(true);
   const [roadmap, setRoadmap] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!isOpen) return;
     fetchRoadmap();
-  }, []);
+  }, [isOpen]);
 
   const fetchRoadmap = async () => {
     setIsLoading(true);
@@ -45,6 +44,8 @@ export default function CareerRoadmapModal({ isOpen, onClose, profile }) {
       setIsLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

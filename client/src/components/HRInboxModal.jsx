@@ -7,8 +7,6 @@ import confetti from 'canvas-confetti';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function HRInboxModal({ isOpen, onClose, onLaunchInterview }) {
-  if (!isOpen) return null;
-
   const { lang, t } = useLanguage();
   const [inboxList, setInboxList] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -17,8 +15,9 @@ export default function HRInboxModal({ isOpen, onClose, onLaunchInterview }) {
   const [selectedNotif, setSelectedNotif] = useState(null);
 
   useEffect(() => {
+    if (!isOpen) return;
     fetchInbox();
-  }, []);
+  }, [isOpen]);
 
   const fetchInbox = async () => {
     setIsLoading(true);
@@ -78,6 +77,8 @@ export default function HRInboxModal({ isOpen, onClose, onLaunchInterview }) {
       console.error(err);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

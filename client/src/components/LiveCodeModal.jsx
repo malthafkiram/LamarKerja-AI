@@ -8,8 +8,6 @@ import confetti from 'canvas-confetti';
 import { stripMarkdownForPlainText } from '../utils/plainText.js';
 
 export default function LiveCodeModal({ isOpen, onClose, jobDetails, profile }) {
-  if (!isOpen) return null;
-
   const [challenge, setChallenge] = useState(null);
   const [difficulty, setDifficulty] = useState('Mid');
   const [isLoading, setIsLoading] = useState(false);
@@ -205,6 +203,8 @@ export default function LiveCodeModal({ isOpen, onClose, jobDetails, profile }) 
       setIsReviewing(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

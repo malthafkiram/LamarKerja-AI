@@ -34,7 +34,7 @@ async function loadUserById(id) {
   return User.findByPk(id, { attributes: { exclude: ['password'] } });
 }
 
-async function downgradeExpiredPlan(user) {
+export async function downgradeExpiredPlan(user) {
   if (user.plan && user.plan !== 'free' && user.plan_expires_at) {
     if (new Date() > new Date(user.plan_expires_at)) {
       user.plan = 'free';

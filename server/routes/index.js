@@ -35,9 +35,9 @@ router.post("/directory/apply/:jobId", requireAuth, directory.applyToJob);
 router.get("/health", settings.health);
 router.get("/stats", stats.getStats);
 router.get("/stats/stream", stats.streamStats);
-router.get("/settings", settings.getAppSettings);
+router.get("/settings", optionalAuth, settings.getAppSettings);
 router.post("/settings/smtp", requireAuth, settings.savePersonalSmtp);
-router.post("/settings", optionalAuth, settings.saveGlobalSettings);
+router.post("/settings", requireAuth, requireAdmin, settings.saveGlobalSettings);
 router.post("/test-smtp", optionalAuth, settings.testSmtp);
 
 // Profile
@@ -106,7 +106,7 @@ router.get("/livecode/preset-challenges", ai.presetChallenges);
 // ATS & CV
 router.post("/ats/audit", uploadCv.single("cv_file"), ats.auditResume);
 router.post("/ats/rewrite-star", ats.rewriteStar);
-router.post("/cv/refine", optionalAuth, cv.refineCv);
+router.post("/cv/refine", requireAuth, cv.refineCv);
 router.post("/cv/save", optionalAuth, cv.saveCv);
 router.get("/cv/saved", optionalAuth, cv.getSavedCv);
 

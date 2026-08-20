@@ -6,8 +6,6 @@ import {
 import confetti from 'canvas-confetti';
 
 export default function InterviewSimulatorModal({ isOpen, onClose, jobDetails }) {
-  if (!isOpen) return null;
-
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
   const [interviewData, setInterviewData] = useState(null);
   const [currentQIndex, setCurrentQIndex] = useState(0);
@@ -18,8 +16,9 @@ export default function InterviewSimulatorModal({ isOpen, onClose, jobDetails })
   const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
+    if (!isOpen || !jobDetails) return;
     startInterview();
-  }, [jobDetails]);
+  }, [isOpen, jobDetails]);
 
   const startInterview = async () => {
     setIsLoadingQuestions(true);
@@ -137,6 +136,8 @@ export default function InterviewSimulatorModal({ isOpen, onClose, jobDetails })
   };
 
   const activeQuestion = interviewData?.questions?.[currentQIndex];
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

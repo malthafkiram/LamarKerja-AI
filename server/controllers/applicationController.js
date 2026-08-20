@@ -10,6 +10,7 @@ import { sendApplicationEmail } from '../services/email.js';
 import { ok, fail, uid } from '../helpers/response.js';
 import { toPublic, toPublicList } from '../views/serialize.js';
 import { normalizeCreatePayload, pickUpdateFields, followUpInfo } from '../helpers/applicationFields.js';
+import { isSmtpCountedSend } from '../helpers/quota.js';
 import { unlinkQuiet } from '../helpers/uploadCleanup.js';
 
 export async function scanBrochure(req, res) {
@@ -177,7 +178,7 @@ export async function listApplications(req, res) {
     const appliedAt = (r) => r.applied_at || r.sent_at;
     const stats = {
       total: publicApps.length,
-      sent_today: publicApps.filter((r) => r.status === 'sent' && appliedAt(r) && new Date(appliedAt(r)) >= startOfDay).length,
+      sent_today: publicApps.filter((r) => isSmtpCountedSend(r) && appliedAt(r) && new Date(appliedAt(r)) >= startOfDay).length,
       total_sent: publicApps.filter((r) => r.status === 'sent').length,
       interview: publicApps.filter((r) => r.status === 'interview').length,
       offering: publicApps.filter((r) => r.status === 'offering' || r.status === 'accepted').length,
@@ -307,7 +308,6 @@ export async function sendFollowUp(req, res) {
       userId: uid(req.user)
     });
 
-    application.status = 'interview';
     application.notes = (application.notes ? application.notes + ' | ' : '') +
       `Follow-up terkirim (${new Date().toLocaleDateString('id-ID')})`;
     await application.save();

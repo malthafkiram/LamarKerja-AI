@@ -6,6 +6,7 @@ import {
 import confetti from 'canvas-confetti';
 import LoadingOverlay from './LoadingOverlay';
 import { useLanguage } from '../context/LanguageContext';
+import { hasSmtpCredentials } from '../utils/smtpConfig';
 
 export default function AutoHunter({ profile, settings, onApplicationSent, onOpenSettings }) {
   const { t, lang } = useLanguage();
@@ -73,7 +74,7 @@ export default function AutoHunter({ profile, settings, onApplicationSent, onOpe
   };
 
   const handleApplyJob = async (job) => {
-    if (!settings.smtp_user || !settings.smtp_pass) {
+    if (!hasSmtpCredentials(profile, settings)) {
       setErrorMessage('Konfigurasi Gmail SMTP belum lengkap. Silakan atur di menu Pengaturan.');
       if (onOpenSettings) onOpenSettings();
       return;

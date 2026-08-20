@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { ShieldCheck, ShieldAlert, AlertTriangle, CheckCircle2, X, RefreshCw, Lock, ExternalLink } from 'lucide-react';
 
 export default function AntiScamModal({ isOpen, onClose, jobDetails, rawText }) {
-  if (!isOpen) return null;
-
   const [isLoading, setIsLoading] = useState(true);
   const [audit, setAudit] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!isOpen) return;
     runAudit();
-  }, [jobDetails, rawText]);
+  }, [isOpen, jobDetails, rawText]);
 
   const runAudit = async () => {
     setIsLoading(true);
@@ -43,6 +42,8 @@ export default function AntiScamModal({ isOpen, onClose, jobDetails, rawText }) 
       setIsLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

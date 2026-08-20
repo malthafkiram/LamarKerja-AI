@@ -6,8 +6,6 @@ import {
 import confetti from 'canvas-confetti';
 
 export default function WhatsAppApplyModal({ isOpen, onClose, jobDetails, profile }) {
-  if (!isOpen) return null;
-
   // Active Tab Mode: 'current' (Loker Terpilih) | 'drop_scan' (Upload/Paste Gambar) | 'text_scan' (Paste Teks Loker)
   const [activeMode, setActiveMode] = useState(jobDetails ? 'current' : 'drop_scan');
   
@@ -222,6 +220,8 @@ export default function WhatsAppApplyModal({ isOpen, onClose, jobDetails, profil
 
     window.open(waUrl, '_blank');
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

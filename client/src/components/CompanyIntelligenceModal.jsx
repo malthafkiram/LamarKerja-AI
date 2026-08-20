@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Building2, Sparkles, HelpCircle, Lightbulb, MessageSquare, CheckCircle2, Copy, X, RefreshCw, Layers, ShieldCheck, Target, ArrowRight } from 'lucide-react';
 
 export default function CompanyIntelligenceModal({ isOpen, onClose, defaultCompany, defaultPosition, defaultIndustry }) {
-  if (!isOpen) return null;
-
   const [companyName, setCompanyName] = useState(defaultCompany || '');
   const [position, setPosition] = useState(defaultPosition || '');
   const [industry, setIndustry] = useState(defaultIndustry || '');
@@ -60,6 +58,8 @@ export default function CompanyIntelligenceModal({ isOpen, onClose, defaultCompa
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

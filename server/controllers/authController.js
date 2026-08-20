@@ -2,7 +2,7 @@
  * Controller autentikasi: daftar, masuk, dan data sesi.
  */
 import { User, Profile } from '../models/index.js';
-import { generateToken } from '../middleware/auth.js';
+import { generateToken, downgradeExpiredPlan } from '../middleware/auth.js';
 import { logAction } from '../helpers/dbHelpers.js';
 import { ok, fail, uid } from '../helpers/response.js';
 import { toPublicUser } from '../views/serialize.js';
@@ -63,6 +63,7 @@ export async function login(req, res) {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) return fail(res, 'Email atau kata sandi salah.', 401);
 
+    await downgradeExpiredPlan(user);
     const token = generateToken(user);
     await logAction('INFO', `Pengguna "${user.name}" (${user.role}) berhasil masuk`, { userId: uid(user) });
 

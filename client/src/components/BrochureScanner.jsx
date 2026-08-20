@@ -13,6 +13,7 @@ import WhatsAppApplyModal from './WhatsAppApplyModal';
 import CoverLetterModal from './CoverLetterModal';
 import CompanyIntelligenceModal from './CompanyIntelligenceModal';
 import LiveCodeModal from './LiveCodeModal';
+import { hasSmtpCredentials } from '../utils/smtpConfig';
 import { useLanguage } from '../context/LanguageContext';
 
 export default function BrochureScanner({ profile, settings, onApplicationSent, onOpenSettings }) {
@@ -165,7 +166,7 @@ export default function BrochureScanner({ profile, settings, onApplicationSent, 
       return;
     }
 
-    if (!settings.smtp_user || !settings.smtp_pass) {
+    if (!hasSmtpCredentials(profile, settings)) {
       setErrorMessage('Konfigurasi Gmail SMTP belum lengkap. Silakan atur email dan App Password di menu Pengaturan.');
       if (onOpenSettings) onOpenSettings();
       return;

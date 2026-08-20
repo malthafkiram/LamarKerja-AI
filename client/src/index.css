@@ -138,6 +138,12 @@ body {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn-emerald {
   background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   color: #FFFFFF;

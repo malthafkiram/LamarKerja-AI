@@ -33,7 +33,7 @@ function memoryStores() {
 }
 
 describe('createSocialProofService', () => {
-  it('counts a first cookie as a unique visitor and ignores the same id on refresh', async () => {
+  it('does not persist a visitor until the browser sends back the cookie id', async () => {
     const { visitorStore, userStore } = memoryStores();
     let n = 0;
     const service = createSocialProofService({
@@ -43,23 +43,32 @@ describe('createSocialProofService', () => {
       now: () => new Date('2026-08-19T03:00:00.000Z')
     });
 
-    const first = await service.touchVisitor({ userAgent: 'Mozilla/5.0 Chrome' });
+    const minted = await service.touchVisitor({ userAgent: 'Mozilla/5.0 Chrome' });
+    assert.equal(minted.isNew, false);
+    assert.equal(minted.persisted, false);
+    assert.equal(minted.visitorId, '00000000-0000-4000-8000-000000000001');
+    assert.equal((await service.getCounts()).visitors, 0);
+
+    const first = await service.touchVisitor({
+      visitorId: minted.visitorId,
+      userAgent: 'Mozilla/5.0 Chrome'
+    });
     assert.equal(first.isNew, true);
-    assert.equal(first.visitorId, '00000000-0000-4000-8000-000000000001');
+    assert.equal(first.persisted, true);
 
     const refresh = await service.touchVisitor({
-      visitorId: first.visitorId,
+      visitorId: minted.visitorId,
       userAgent: 'Mozilla/5.0 Chrome'
     });
     assert.equal(refresh.isNew, false);
-    assert.equal(refresh.visitorId, first.visitorId);
+    assert.equal(refresh.visitorId, minted.visitorId);
 
     const counts = await service.getCounts();
     assert.equal(counts.visitors, 1);
     assert.equal(counts.registered, 0);
   });
 
-  it('treats a second anonymous visitor as +1 and reports real registered count', async () => {
+  it('does not count parallel cookie-less hits as extra people', async () => {
     const { visitorStore, userStore } = memoryStores();
     let n = 0;
     const service = createSocialProofService({
@@ -68,8 +77,30 @@ describe('createSocialProofService', () => {
       randomUUID: () => `00000000-0000-4000-8000-00000000000${++n}`
     });
 
-    await service.touchVisitor({ userAgent: 'Mozilla/5.0' });
-    await service.touchVisitor({ userAgent: 'Mozilla/5.0' });
+    await Promise.all([
+      service.touchVisitor({ userAgent: 'Mozilla/5.0' }),
+      service.touchVisitor({ userAgent: 'Mozilla/5.0' }),
+      service.touchVisitor({ userAgent: 'Mozilla/5.0' })
+    ]);
+    assert.equal((await service.getCounts()).visitors, 0);
+  });
+
+  it('treats a second anonymous cookie as +1 and reports real registered count', async () => {
+    const { visitorStore, userStore } = memoryStores();
+    const service = createSocialProofService({
+      visitorStore,
+      userStore,
+      randomUUID: () => '00000000-0000-4000-8000-000000000099'
+    });
+
+    await service.touchVisitor({
+      visitorId: '00000000-0000-4000-8000-000000000001',
+      userAgent: 'Mozilla/5.0'
+    });
+    await service.touchVisitor({
+      visitorId: '00000000-0000-4000-8000-000000000002',
+      userAgent: 'Mozilla/5.0'
+    });
     userStore.setCount(5);
 
     const counts = await service.getCounts();

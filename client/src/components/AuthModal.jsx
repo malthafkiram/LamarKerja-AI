@@ -7,8 +7,6 @@ import BrandLogo from './BrandLogo';
 import SocialProofStats from './SocialProofStats';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess, onSuccess, visitors = 0, registered = 0, live = false }) {
-  if (!isOpen) return null;
-
   const [mode, setMode] = useState('login'); // 'login' or 'register'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -71,6 +69,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, onSuccess, v
       setIsLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

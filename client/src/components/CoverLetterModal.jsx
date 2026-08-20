@@ -3,8 +3,6 @@ import { FileText, Copy, CheckCircle2, Download, Printer, RefreshCw, X, Sparkles
 import confetti from 'canvas-confetti';
 
 export default function CoverLetterModal({ isOpen, onClose, defaultCompany, defaultPosition, defaultRequirements, defaultLocation, defaultDescription, profile }) {
-  if (!isOpen) return null;
-
   const [companyName, setCompanyName] = useState(defaultCompany || '');
   const [position, setPosition] = useState(defaultPosition || '');
   const [language, setLanguage] = useState('id'); // 'id' | 'en'
@@ -107,6 +105,8 @@ export default function CoverLetterModal({ isOpen, onClose, defaultCompany, defa
       printWindow.close();
     }, 250);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div style={{

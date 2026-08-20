@@ -3,7 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { Op } from 'sequelize';
 import { getSettings, logAction } from '../helpers/dbHelpers.js';
-import { Application } from '../models/index.js';
+import { Application, User } from '../models/index.js';
+import { effectiveSendLimit } from '../helpers/quota.js';
 
 /**
  * Create Nodemailer Transporter based on personal or system settings
@@ -16,10 +17,17 @@ export function getMailTransporter(smtpConfig) {
     throw new Error('Konfigurasi SMTP Gmail belum lengkap. Silakan masukkan Alamat Gmail dan Google App Password di menu Pengaturan.');
   }
 
+  const port = parseInt(smtpConfig.smtp_port, 10) || 465;
+  const secure =
+    smtpConfig.smtp_secure === 1 ||
+    smtpConfig.smtp_secure === true ||
+    smtpConfig.smtp_secure === '1' ||
+    port === 465;
+
   return nodemailer.createTransport({
     host: smtpConfig.smtp_host || 'smtp.gmail.com',
-    port: parseInt(smtpConfig.smtp_port, 10) || 465,
-    secure: smtpConfig.smtp_secure === 1 || smtpConfig.smtp_port == 465 || true,
+    port,
+    secure,
     auth: { user, pass }
   });
 }
@@ -29,7 +37,12 @@ export function getMailTransporter(smtpConfig) {
  */
 export async function checkDailyLimit(userId = null) {
   const settings = await getSettings();
-  const limit = settings.daily_limit || 30;
+  let bonus = 0;
+  if (userId) {
+    const user = await User.findByPk(userId, { attributes: ['bonus_quota'] });
+    bonus = user?.bonus_quota || 0;
+  }
+  const limit = effectiveSendLimit(settings.daily_limit, bonus);
 
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
@@ -39,7 +52,8 @@ export async function checkDailyLimit(userId = null) {
 
   const where = {
     status: 'sent',
-    sent_at: { [Op.between]: [startOfDay, endOfDay] }
+    sent_at: { [Op.between]: [startOfDay, endOfDay] },
+    recipient_email: { [Op.and]: [{ [Op.ne]: null }, { [Op.ne]: '' }] }
   };
   if (userId) where.userId = userId;
 
@@ -106,7 +120,7 @@ export async function sendApplicationEmail({
     to: recipientEmail.trim(),
     subject: subject.trim(),
     text: bodyText || '',
-    html: bodyHtml || bodyText.replace(/\n/g, '<br/>'),
+    html: bodyHtml || String(bodyText || '').replace(/\n/g, '<br/>'),
     attachments: mailAttachments
   };
 

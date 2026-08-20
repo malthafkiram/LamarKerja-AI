@@ -1,24 +1,20 @@
 /**
  * Controller pengaturan sistem, kesehatan API, dan tes SMTP.
  */
-import { User } from '../models/index.js';
 import { getSettings, updateSettings, updateProfile, logAction } from '../helpers/dbHelpers.js';
 import { verifySmtp } from '../services/email.js';
+import { toClientSettings } from '../helpers/settingsPublic.js';
 import { ok, fail, uid } from '../helpers/response.js';
 
 export function health(_req, res) {
   return res.json({ status: 'ok', database: 'PostgreSQL', timestamp: new Date().toISOString() });
 }
 
-export async function getAppSettings(_req, res) {
+export async function getAppSettings(req, res) {
   try {
     const settings = await getSettings();
-    const maskedSettings = { ...settings };
-    if (maskedSettings.smtp_pass && maskedSettings.smtp_pass.length > 4) {
-      maskedSettings.smtp_pass_masked =
-        maskedSettings.smtp_pass.slice(0, 3) + '••••••••' + maskedSettings.smtp_pass.slice(-3);
-    }
-    return ok(res, { settings: maskedSettings });
+    const isAdmin = req.user?.role === 'admin';
+    return ok(res, { settings: toClientSettings(settings, { isAdmin }) });
   } catch (error) {
     return fail(res, error.message);
   }
@@ -37,14 +33,9 @@ export async function savePersonalSmtp(req, res) {
 
 export async function saveGlobalSettings(req, res) {
   try {
-    const totalUsers = await User.count();
-    if (totalUsers > 0 && req.user && req.user.role !== 'admin') {
-      return fail(res, 'Akses ditolak. Pengaturan Groq AI API Key hanya dapat diubah oleh Administrator.', 403);
-    }
-
     const updated = await updateSettings(req.body);
     await logAction('INFO', 'Pengaturan sistem & Groq AI API Key berhasil diperbarui');
-    return ok(res, { settings: updated });
+    return ok(res, { settings: toClientSettings(updated, { isAdmin: true }) });
   } catch (error) {
     return fail(res, error.message);
   }

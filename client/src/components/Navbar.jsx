@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import BrandLogo from './BrandLogo';
+import { daysRemaining, isPaidPlan } from '../utils/planStatus';
 
 export default function Navbar({ 
   activeTab, 
@@ -27,6 +28,13 @@ export default function Navbar({
   const { lang, t } = useLanguage();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
+  const paidPlan = isPaidPlan(currentUser);
+  const daysLeft = paidPlan ? daysRemaining(currentUser?.plan_expires_at) : null;
+  const proButtonLabel = paidPlan
+    ? (daysLeft != null
+      ? `PRO · ${daysLeft}${lang === 'id' ? 'h' : 'd'}`
+      : 'PRO')
+    : (lang === 'id' ? 'Upgrade PRO' : 'Get PRO');
 
   const navItems = [
     { id: 'jobs', label: t('nav_directory', 'Jelajah Loker'), icon: Globe },
@@ -262,7 +270,7 @@ export default function Navbar({
               title={lang === 'id' ? 'Upgrade ke PRO Unlimited' : 'Upgrade to PRO Unlimited'}
             >
               <Crown size={14} color="#fff" />
-              <span>{currentUser?.plan === 'pro' || currentUser?.plan === 'vip' ? 'PRO' : (lang === 'id' ? 'Upgrade PRO' : 'Get PRO')}</span>
+              <span>{proButtonLabel}</span>
             </button>
 
             {/* User Account / Login Button */}
@@ -450,7 +458,13 @@ export default function Navbar({
               }}
             >
               <Crown size={15} />
-              <span>{currentUser?.plan === 'pro' || currentUser?.plan === 'vip' ? '👑 Status PRO Aktif' : '👑 Upgrade LamarKerja PRO'}</span>
+              <span>
+                {paidPlan
+                  ? (daysLeft != null
+                    ? (lang === 'id' ? `👑 PRO aktif · sisa ${daysLeft} hari` : `👑 PRO · ${daysLeft} days left`)
+                    : '👑 Status PRO Aktif')
+                  : (lang === 'id' ? '👑 Upgrade LamarKerja PRO' : '👑 Upgrade to PRO')}
+              </span>
             </button>
           </div>
 

@@ -17,27 +17,30 @@ export function createSocialProofService({
 
   async function touchVisitor({ visitorId, userAgent } = {}) {
     if (isBotUserAgent(userAgent)) {
-      return { skipped: true, isNew: false, visitorId: null };
+      return { skipped: true, isNew: false, visitorId: null, persisted: false };
     }
 
     const knownId = isValidVisitorId(visitorId) ? visitorId : null;
     const at = getNow();
 
-    if (knownId) {
-      const existing = await visitorStore.findById(knownId);
-      if (existing) {
-        await visitorStore.updateLastSeen(knownId, at);
-        return { skipped: false, isNew: false, visitorId: knownId };
-      }
+    // Cookie-less hits only mint an id. Persisting here would double/triple-count
+    // when React StrictMode or GET /stats + EventSource race before Set-Cookie lands.
+    if (!knownId) {
+      return { skipped: false, isNew: false, visitorId: uuid(), persisted: false };
     }
 
-    const id = knownId || uuid();
+    const existing = await visitorStore.findById(knownId);
+    if (existing) {
+      await visitorStore.updateLastSeen(knownId, at);
+      return { skipped: false, isNew: false, visitorId: knownId, persisted: true };
+    }
+
     await visitorStore.create({
-      visitor_id: id,
+      visitor_id: knownId,
       first_seen: at,
       last_seen: at
     });
-    return { skipped: false, isNew: true, visitorId: id };
+    return { skipped: false, isNew: true, visitorId: knownId, persisted: true };
   }
 
   async function getCounts() {
