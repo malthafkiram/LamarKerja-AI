@@ -909,5 +909,15 @@ export async function getDirectoryJobs({
   };
 }
 
-export const seedJobDirectoryIfEmpty = seedOrSyncDirectoryJobs;
+export async function seedJobDirectoryIfEmpty() {
+  const existing = await JobDirectory.count();
+  if (existing > 0) {
+    console.log(
+      `✓ [JobHub] Direktori sudah berisi ${existing} loker — skip sinkronisasi penuh saat boot (gunakan POST /api/directory/sync untuk refresh).`
+    );
+    return { skipped: true, total: existing };
+  }
+  return seedOrSyncDirectoryJobs();
+}
+
 export const syncAllJobs = seedOrSyncDirectoryJobs;
