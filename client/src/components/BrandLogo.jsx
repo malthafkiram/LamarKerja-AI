@@ -44,6 +44,7 @@ export default function BrandLogo({
       />
       {showWordmark && (
         <span
+          className="brand-wordmark"
           style={{
             fontSize: typeSize,
             fontWeight: 800,

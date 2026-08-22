@@ -129,7 +129,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, onSuccess, v
         </div>
 
         {/* Tab Switcher (Masuk vs Daftar) */}
-        <div style={{
+        <div className="keep-cols" style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           background: 'rgba(15, 23, 42, 0.8)',

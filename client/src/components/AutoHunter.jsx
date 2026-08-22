@@ -116,7 +116,7 @@ export default function AutoHunter({ profile, settings, onApplicationSent, onOpe
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       
       {/* Hero Header */}
-      <div className="glass-panel" style={{
+      <div className="glass-panel page-hero" style={{
         padding: '24px 32px',
         background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%)',
         display: 'flex',
@@ -164,7 +164,7 @@ export default function AutoHunter({ profile, settings, onApplicationSent, onOpe
 
       {/* Search Filter Controls */}
       <div className="glass-panel" style={{ padding: '20px 24px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr auto', gap: '14px', alignItems: 'flex-end' }}>
+        <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr auto', gap: '14px', alignItems: 'flex-end' }}>
           <div>
             <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
               {lang === 'id' ? 'Posisi / Kata Kunci Pekerjaan:' : 'Job Position / Keyword:'}
@@ -289,7 +289,7 @@ export default function AutoHunter({ profile, settings, onApplicationSent, onOpe
             </p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '18px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(380px, 100%), 1fr))', gap: '18px' }}>
             {jobs.map((job) => {
               const isApplied = job.status === 'applied' || appliedJobs[job.id];
               const isApplying = applyingJobId === job.id;

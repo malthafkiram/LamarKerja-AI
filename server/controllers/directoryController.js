@@ -6,13 +6,33 @@ import { JobDirectory, Application } from '../models/index.js';
 import { getProfile, logAction } from '../helpers/dbHelpers.js';
 import { analyzeMatchAndDraft } from '../services/ai.js';
 import { sendApplicationEmail } from '../services/email.js';
-import { getDirectoryJobs, syncAllJobs } from '../services/jobHubService.js';
+import { getDirectoryJobs, ingestLinkedInLiveSearchForDirectory, shouldLiveIngestSearch, syncAllJobs } from '../services/jobHubService.js';
 import { getJobNews, syncJobNews } from '../services/jobNewsService.js';
 import { ok, fail, uid } from '../helpers/response.js';
 
 export async function listJobs(req, res) {
   try {
     const { search, platform, category, work_type, location, experience_level, page, limit } = req.query;
+    const pageNum = parseInt(page, 10) || 1;
+    let liveIngest = null;
+
+    if (shouldLiveIngestSearch(search, { page: pageNum, platform })) {
+      try {
+        liveIngest = await ingestLinkedInLiveSearchForDirectory(search);
+      } catch (err) {
+        console.warn('[JobHub] live LinkedIn search gagal:', err.message);
+        liveIngest = {
+          attempted: false,
+          skipped: 'error',
+          keyword: search,
+          fetched: 0,
+          inserted: 0,
+          updated: 0,
+          error: err.message
+        };
+      }
+    }
+
     const result = await getDirectoryJobs({
       search,
       platform,
@@ -20,10 +40,10 @@ export async function listJobs(req, res) {
       work_type,
       location,
       experience_level,
-      page: parseInt(page, 10) || 1,
+      page: pageNum,
       limit: parseInt(limit, 10) || 100
     });
-    return ok(res, result);
+    return ok(res, { ...result, liveIngest });
   } catch (error) {
     return fail(res, error.message);
   }

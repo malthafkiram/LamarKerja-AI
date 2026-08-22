@@ -44,6 +44,8 @@ export const translations = {
     jdh_no_jobs: "Tidak ada lowongan yang cocok dengan filter ini.",
     jdh_try_reset:
       "Kosongkan kata kunci, reset filter, atau sinkronkan ulang. Sumber hub: LinkedIn guest, Dealls, Disnakerja, KarirJakarta, Karirhub, Toploker, Karirlink, Remotive, Arbeitnow, Jobicy, Himalayas, Remote OK — bukan Glints/JobStreet.",
+    jdh_live_search_hint:
+      "Ketik posisi lalu jeda: app mengambil LinkedIn guest untuk kata itu (bukan seluruh LinkedIn).",
     jdh_page: "Halaman",
     jdh_of: "dari",
     jdh_showing: "Menampilkan",
@@ -316,6 +318,8 @@ export const translations = {
     jdh_no_jobs: "No vacancies match these filters.",
     jdh_try_reset:
       "Clear the keyword, reset filters, or sync again. Hub sources: LinkedIn guest, Dealls, Disnakerja, KarirJakarta, Karirhub, Toploker, Karirlink, Remotive, Arbeitnow, Jobicy, Himalayas, Remote OK — not Glints/JobStreet.",
+    jdh_live_search_hint:
+      "Type a role and pause: the app pulls LinkedIn guest for that keyword (not all of LinkedIn).",
     jdh_page: "Page",
     jdh_of: "of",
     jdh_showing: "Showing",

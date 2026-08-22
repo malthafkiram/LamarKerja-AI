@@ -85,6 +85,7 @@ export default function JobDirectoryHub({
   const [newsKind, setNewsKind] = useState("all");
   const [newsError, setNewsError] = useState(null);
   const [newsNotice, setNewsNotice] = useState(null);
+  const [liveSearchNotice, setLiveSearchNotice] = useState(null);
 
   const platforms = [
     { id: "all", label: "Semua Platform", color: "#0EA5E9" },
@@ -211,7 +212,7 @@ export default function JobDirectoryHub({
     if (viewMode === "news") return undefined;
     const timer = setTimeout(() => {
       fetchJobs(search, page, limit);
-    }, 300);
+    }, 700);
     return () => clearTimeout(timer);
   }, [
     search,
@@ -273,6 +274,28 @@ export default function JobDirectoryHub({
           data.totalPages || Math.ceil((data.total || 0) / limitNum) || 1,
         );
         if (data.countsMap) setPlatformCounts(data.countsMap);
+        const live = data.liveIngest;
+        if (live?.skipped === "error") {
+          setLiveSearchNotice(
+            lang === "id"
+              ? `Pencarian LinkedIn gagal: ${live.error}. Menampilkan yang sudah ada di direktori.`
+              : `LinkedIn search failed: ${live.error}. Showing directory results.`,
+          );
+        } else if (live?.attempted && live.fetched > 0) {
+          setLiveSearchNotice(
+            lang === "id"
+              ? `LinkedIn: ${live.fetched} loker untuk “${live.keyword}” (${live.inserted} baru). Ini guest 8 hari, bukan seluruh LinkedIn.`
+              : `LinkedIn: ${live.fetched} jobs for “${live.keyword}” (${live.inserted} new). Guest 8-day sample, not all of LinkedIn.`,
+          );
+        } else if (live?.attempted && live.fetched === 0) {
+          setLiveSearchNotice(
+            lang === "id"
+              ? `LinkedIn guest tidak mengembalikan kartu untuk “${live.keyword}”. Coba kata kunci lain atau buka LinkedIn langsung.`
+              : `LinkedIn guest returned no cards for “${live.keyword}”. Try another keyword or open LinkedIn.`,
+          );
+        } else {
+          setLiveSearchNotice(null);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch directory jobs:", err);
@@ -580,7 +603,7 @@ export default function JobDirectoryHub({
     <div style={{ display: "flex", flexDirection: "column", gap: "28px" }}>
       {/* Hero Header */}
       <div
-        className="glass-panel"
+        className="glass-panel page-hero"
         style={{
           padding: "30px 34px",
           background:
@@ -746,6 +769,33 @@ export default function JobDirectoryHub({
         </div>
       )}
 
+      {liveSearchNotice && (
+        <div
+          style={{
+            padding: "12px 18px",
+            borderRadius: "12px",
+            background: /gagal|fail/i.test(liveSearchNotice)
+              ? "rgba(244, 63, 94, 0.15)"
+              : "rgba(14, 165, 233, 0.12)",
+            border: /gagal|fail/i.test(liveSearchNotice)
+              ? "1px solid rgba(244, 63, 94, 0.35)"
+              : "1px solid rgba(56, 189, 248, 0.35)",
+            color: /gagal|fail/i.test(liveSearchNotice) ? "#FDA4AF" : "#7DD3FC",
+            fontSize: "0.85rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          {/gagal|fail/i.test(liveSearchNotice) ? (
+            <AlertCircle size={16} />
+          ) : (
+            <CheckCircle2 size={16} />
+          )}
+          <span>{liveSearchNotice}</span>
+        </div>
+      )}
+
       {logMessage && (
         <div
           style={{
@@ -780,6 +830,8 @@ export default function JobDirectoryHub({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            gap: "8px",
+            flexWrap: "wrap",
           }}
         >
           <span
@@ -801,7 +853,7 @@ export default function JobDirectoryHub({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(160px, 100%), 1fr))",
             gap: "10px",
           }}
         >
@@ -1018,6 +1070,7 @@ export default function JobDirectoryHub({
       {/* Search & Filter Bar */}
       <div className="glass-panel" style={{ padding: "20px" }}>
         <div
+          className="stack-mobile"
           style={{
             display: "grid",
             gridTemplateColumns:
@@ -1073,8 +1126,8 @@ export default function JobDirectoryHub({
                         "Cari judul berita, sumber, atau perusahaan...",
                       )
                     : lang === "id"
-                      ? "Ketik posisi, perusahaan, atau skill..."
-                      : "Type position, company, or skills..."
+                      ? "Ketik posisi, lalu jeda. App akan cari di LinkedIn guest..."
+                      : "Type a role, then pause. The app searches LinkedIn guest..."
                 }
                 value={search}
                 onChange={(e) => {
@@ -1113,6 +1166,11 @@ export default function JobDirectoryHub({
                 </button>
               )}
             </div>
+            {viewMode !== "news" && (
+              <p style={{ fontSize: "0.72rem", color: "var(--text-dim)", margin: "6px 0 0" }}>
+                {t("jdh_live_search_hint")}
+              </p>
+            )}
           </div>
 
           {viewMode !== "news" && (
@@ -1429,7 +1487,7 @@ export default function JobDirectoryHub({
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(min(360px, 100%), 1fr))",
                 gap: "20px",
               }}
             >
@@ -1729,7 +1787,7 @@ export default function JobDirectoryHub({
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(min(360px, 100%), 1fr))",
                 gap: "20px",
               }}
             >
@@ -1770,6 +1828,8 @@ export default function JobDirectoryHub({
                           alignItems: "center",
                           justifyContent: "space-between",
                           marginBottom: "10px",
+                          gap: "8px",
+                          flexWrap: "wrap",
                         }}
                       >
                         <span
@@ -1923,7 +1983,7 @@ export default function JobDirectoryHub({
                         style={{
                           display: "grid",
                           gridTemplateColumns:
-                            "repeat(auto-fit, minmax(105px, 1fr))",
+                            "repeat(auto-fit, minmax(min(105px, 100%), 1fr))",
                           gap: "6px",
                           marginTop: "12px",
                         }}

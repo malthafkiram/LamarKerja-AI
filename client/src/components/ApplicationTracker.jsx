@@ -251,7 +251,7 @@ export default function ApplicationTracker({ stats, onRefresh, currentUser, sett
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
-      <div className="glass-panel" style={{
+      <div className="glass-panel page-hero" style={{
         padding: '24px 28px',
         background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(99, 102, 241, 0.08) 100%)',
         display: 'flex',
@@ -275,7 +275,7 @@ export default function ApplicationTracker({ stats, onRefresh, currentUser, sett
       </div>
 
       {/* Top Metrics Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', gap: '16px' }}>
         <div className="glass-panel" style={{ padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(56, 189, 248, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <FileText size={24} color="#38BDF8" />
@@ -384,7 +384,7 @@ export default function ApplicationTracker({ stats, onRefresh, currentUser, sett
 
       {/* Filter & Search Bar */}
       <div className="glass-panel" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '260px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
           <Search size={18} color="var(--text-dim)" />
           <input
             type="text"
@@ -416,7 +416,7 @@ export default function ApplicationTracker({ stats, onRefresh, currentUser, sett
       </div>
 
       {/* Applications Table / Cards */}
-      <div className="glass-panel" style={{ padding: '0', overflow: 'hidden' }}>
+      <div className="glass-panel glass-panel-flush" style={{ padding: '0', overflow: 'hidden' }}>
         {isLoading ? (
           <LoadingOverlay
             fullScreen={false}
@@ -687,7 +687,7 @@ export default function ApplicationTracker({ stats, onRefresh, currentUser, sett
                 placeholder="https://glints.com/id/opportunities/jobs/..."
               />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <div>
                 <label style={fieldLabel}>{lang === 'id' ? 'Sumber / platform' : 'Source / platform'}</label>
                 <select
@@ -794,7 +794,7 @@ export default function ApplicationTracker({ stats, onRefresh, currentUser, sett
               </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', background: 'rgba(15, 23, 42, 0.8)', padding: '14px', borderRadius: '10px' }}>
+            <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', background: 'rgba(15, 23, 42, 0.8)', padding: '14px', borderRadius: '10px' }}>
               <div>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>{lang === 'id' ? 'Sumber:' : 'Source:'}</div>
                 <div style={{ marginTop: '4px' }}>{sourceBadge(selectedApp.source)}</div>

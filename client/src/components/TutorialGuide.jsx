@@ -204,7 +204,7 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '1100px', margin: '0 auto' }}>
       
       {/* Hero Header */}
-      <div className="glass-panel" style={{
+      <div className="glass-panel page-hero" style={{
         padding: '32px 36px',
         background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.15) 0%, rgba(99, 102, 241, 0.12) 100%)',
         display: 'flex',
@@ -250,7 +250,7 @@ export default function TutorialGuide({ onOpenSettings, onNavigateTab }) {
           {lang === 'id' ? 'Alur Kerja 4 Langkah Praktis' : '4-Step Practical Workflow'}
         </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '18px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '18px' }}>
           
           <div className="glass-panel" style={{ padding: '22px', position: 'relative', overflow: 'hidden' }}>
             <div style={{ position: 'absolute', top: '12px', right: '16px', fontSize: '2.5rem', fontWeight: 900, color: 'rgba(255, 255, 255, 0.04)' }}>01</div>

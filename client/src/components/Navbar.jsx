@@ -37,13 +37,13 @@ export default function Navbar({
     : (lang === 'id' ? 'Upgrade PRO' : 'Get PRO');
 
   const navItems = [
-    { id: 'jobs', label: t('nav_directory', 'Jelajah Loker'), icon: Globe },
-    { id: 'cv-builder', label: t('nav_cv_builder', 'Buat CV AI'), icon: FilePlus },
-    { id: 'ats', label: t('nav_ats', 'Audit CV ATS'), icon: FileCheck },
-    { id: 'livecode', label: t('nav_livecode', 'Live Code'), icon: Code2 },
-    { id: 'scanner', label: t('nav_dropsend', 'Drop & Send'), icon: Send },
-    { id: 'tracker', label: t('nav_history', 'Riwayat'), icon: FileText, count: stats?.total_sent || 0 },
-    { id: 'profile', label: t('nav_profile', 'Profil & CV'), icon: User },
+    { id: 'jobs', label: t('nav_directory', 'Jelajah Loker'), shortLabel: lang === 'id' ? 'Loker' : 'Jobs', icon: Globe },
+    { id: 'cv-builder', label: t('nav_cv_builder', 'Buat CV AI'), shortLabel: 'CV', icon: FilePlus },
+    { id: 'ats', label: t('nav_ats', 'Audit CV ATS'), shortLabel: 'ATS', icon: FileCheck },
+    { id: 'livecode', label: t('nav_livecode', 'Live Code'), shortLabel: 'Code', icon: Code2 },
+    { id: 'scanner', label: t('nav_dropsend', 'Drop & Send'), shortLabel: lang === 'id' ? 'Kirim' : 'Send', icon: Send },
+    { id: 'tracker', label: t('nav_history', 'Riwayat'), shortLabel: lang === 'id' ? 'Riwayat' : 'Log', icon: FileText, count: stats?.total_sent || 0 },
+    { id: 'profile', label: t('nav_profile', 'Profil & CV'), shortLabel: lang === 'id' ? 'Profil' : 'Profile', icon: User },
   ];
 
   const handleTabClick = (tabId) => {
@@ -54,7 +54,7 @@ export default function Navbar({
   return (
     <>
       {/* Main Top Header Bar */}
-      <header style={{
+      <header className="app-header" style={{
         borderBottom: '1px solid var(--border-glass)',
         background: 'rgba(7, 9, 14, 0.95)',
         backdropFilter: 'blur(20px)',
@@ -62,7 +62,8 @@ export default function Navbar({
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        padding: '0 20px'
+        padding: '0 20px',
+        paddingTop: 'env(safe-area-inset-top, 0px)'
       }}>
         <div style={{
           maxWidth: '1440px',
@@ -71,7 +72,9 @@ export default function Navbar({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '16px'
+          gap: '12px',
+          minWidth: 0,
+          width: '100%'
         }}>
           {/* Left: Brand Logo & Title */}
           <div 
@@ -270,7 +273,7 @@ export default function Navbar({
               title={lang === 'id' ? 'Upgrade ke PRO Unlimited' : 'Upgrade to PRO Unlimited'}
             >
               <Crown size={14} color="#fff" />
-              <span>{proButtonLabel}</span>
+              <span className="nav-pro-label">{proButtonLabel}</span>
             </button>
 
             {/* User Account / Login Button */}
@@ -306,7 +309,7 @@ export default function Navbar({
                 <span className="settings-text-desktop" style={{ fontSize: '0.8rem', fontWeight: 700, color: '#F8FAFC', maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {currentUser.name?.split(' ')[0]}
                 </span>
-                <span className={`badge ${currentUser.plan === 'vip' ? 'badge-amber' : currentUser.plan === 'pro' ? 'badge-emerald' : 'badge-cyan'}`} style={{ fontSize: '0.58rem', fontWeight: 800, padding: '1px 5px' }}>
+                <span className={`nav-plan-badge badge ${currentUser.plan === 'vip' ? 'badge-amber' : currentUser.plan === 'pro' ? 'badge-emerald' : 'badge-cyan'}`} style={{ fontSize: '0.58rem', fontWeight: 800, padding: '1px 5px' }}>
                   {currentUser.plan?.toUpperCase()}
                 </span>
               </button>
@@ -513,11 +516,11 @@ export default function Navbar({
                 }}>
                   {currentUser.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
-                <div>
-                  <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#F8FAFC' }}>
+                <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                  <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#F8FAFC', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {currentUser.name}
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: '#38BDF8' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#38BDF8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {currentUser.email} • Kelola Profil &gt;
                   </div>
                 </div>
@@ -603,7 +606,7 @@ export default function Navbar({
                 letterSpacing: '-0.01em',
                 lineHeight: 1
               }}>
-                {item.label}
+                {item.shortLabel || item.label}
               </span>
             </button>
           );

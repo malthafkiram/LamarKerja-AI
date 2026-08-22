@@ -233,7 +233,7 @@ export default function ProfileManager({ profile, onProfileUpdated }) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       
       {/* Top Banner */}
-      <div className="glass-panel" style={{
+      <div className="glass-panel page-hero" style={{
         padding: '24px 32px',
         background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(16, 185, 129, 0.08) 100%)',
         display: 'flex',
@@ -292,7 +292,7 @@ export default function ProfileManager({ profile, onProfileUpdated }) {
       {/* AI Career Booster & Project Pitch Tools */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
         gap: '16px'
       }}>
         {/* Card 1: Pitch Proyek */}
@@ -502,7 +502,7 @@ export default function ProfileManager({ profile, onProfileUpdated }) {
       </div>
 
       {/* Main Grid: Upload CV File & Profile Form */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '24px' }}>
+      <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '24px' }}>
         
         {/* Left Column: Upload CV & Attachments */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

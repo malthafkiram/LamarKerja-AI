@@ -366,7 +366,7 @@ export default function InterviewSimulatorModal({ isOpen, onClose, jobDetails })
                   )}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.82rem' }}>
+                <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '0.82rem' }}>
                   <div style={{ background: 'rgba(16, 185, 129, 0.08)', padding: '12px', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
                     <div style={{ fontWeight: 700, color: '#34D399', marginBottom: '6px' }}>✓ Kekuatan Jawaban:</div>
                     <ul style={{ margin: 0, paddingLeft: '16px', color: 'var(--text-muted)' }}>

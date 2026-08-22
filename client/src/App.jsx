@@ -249,7 +249,7 @@ function AppContent() {
       />
 
       {currentUser && (
-        <div style={{ maxWidth: "1440px", width: "100%", margin: "0 auto", padding: "0 20px" }}>
+        <div className="app-banner-wrap" style={{ maxWidth: "1440px", width: "100%", margin: "0 auto", padding: "0 20px" }}>
           <PlanStatusBanner
             currentUser={currentUser}
             stats={stats}
@@ -262,12 +262,14 @@ function AppContent() {
 
       {/* Main Content Area */}
       <main
+        className="app-main"
         style={{
           flex: 1,
           maxWidth: "1440px",
           width: "100%",
           margin: "0 auto",
           padding: "24px 20px",
+          minWidth: 0,
         }}
       >
         {/* Tab 1: Multi-Platform Job Directory (Accessible to all) */}

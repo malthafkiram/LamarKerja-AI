@@ -356,7 +356,7 @@ export default function LiveCodeArena({ profile, initialJobDetails }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* SECTION 1: Clean Top Header Hero */}
-      <div className="glass-panel" style={{
+      <div className="glass-panel page-hero" style={{
         padding: '20px 24px',
         background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(99, 102, 241, 0.08) 100%)',
         display: 'flex',
@@ -536,7 +536,7 @@ export default function LiveCodeArena({ profile, initialJobDetails }) {
       {/* SECTION 3: Main Split-View Coding Arena (Problem Left vs Code Editor Right) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(360px, 100%), 1fr))',
         gap: '16px',
         alignItems: 'start'
       }}>
@@ -946,7 +946,7 @@ export default function LiveCodeArena({ profile, initialJobDetails }) {
               {t('lc_catalog_modal_desc', 'Kumpulan soal teknis standar industri yang paling sering diujikan di perusahaan teknologi. Pilih soal untuk langsung mulai koding!')}
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '10px' }}>
               {presetCatalog.map((item, idx) => (
                 <div
                   key={idx}
@@ -1035,7 +1035,7 @@ export default function LiveCodeArena({ profile, initialJobDetails }) {
             </div>
 
             {/* Score Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '10px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(130px, 100%), 1fr))', gap: '10px' }}>
               <div style={{ background: 'rgba(15, 23, 42, 0.7)', padding: '12px', borderRadius: '12px', border: '1px solid var(--border-glass)', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{t('review_score_overall', 'Skor Keseluruhan')}</div>
                 <div style={{ fontSize: '1.7rem', fontWeight: 800, color: aiReview.overall_score >= 85 ? '#34D399' : '#FBBF24' }}>
@@ -1080,7 +1080,7 @@ export default function LiveCodeArena({ profile, initialJobDetails }) {
             </div>
 
             {/* Strengths & Edge Cases */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '12px' }}>
               <div style={{ background: 'rgba(16, 185, 129, 0.06)', padding: '14px', borderRadius: '10px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#34D399', marginBottom: '6px' }}>
                   {t('review_strengths_title', '✓ Kelebihan Kode Anda:')}

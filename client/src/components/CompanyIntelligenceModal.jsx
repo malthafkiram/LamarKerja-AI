@@ -122,7 +122,7 @@ export default function CompanyIntelligenceModal({ isOpen, onClose, defaultCompa
         </div>
 
         {/* Search Bar */}
-        <div style={{
+        <div className="stack-mobile" style={{
           background: 'rgba(15, 23, 42, 0.7)',
           border: '1px solid var(--border-glass)',
           borderRadius: '12px',
@@ -187,7 +187,7 @@ export default function CompanyIntelligenceModal({ isOpen, onClose, defaultCompa
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
             {/* Section 1: Overview & Culture */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: '14px' }}>
               <div className="glass-panel" style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Building2 size={18} color="#C084FC" />

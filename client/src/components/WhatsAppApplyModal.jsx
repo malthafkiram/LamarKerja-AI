@@ -443,7 +443,7 @@ export default function WhatsAppApplyModal({ isOpen, onClose, jobDetails, profil
         )}
 
         {/* Target Info & Phone Editor Bar */}
-        <div style={{
+        <div className="stack-mobile" style={{
           background: 'rgba(15, 23, 42, 0.7)',
           border: '1px solid var(--border-glass)',
           borderRadius: '12px',

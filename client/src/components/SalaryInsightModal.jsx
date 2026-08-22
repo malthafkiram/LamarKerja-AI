@@ -95,7 +95,7 @@ export default function SalaryInsightModal({ isOpen, onClose, defaultPosition, d
         </div>
 
         {/* Inputs */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr auto', gap: '10px', alignItems: 'end' }}>
+        <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr auto', gap: '10px', alignItems: 'end' }}>
           <div>
             <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'block', marginBottom: '4px', fontWeight: 600 }}>
               Posisi Pekerjaan:
@@ -160,7 +160,7 @@ export default function SalaryInsightModal({ isOpen, onClose, defaultPosition, d
           <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
             
             {/* Salary Gauge Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1fr', gap: '12px' }}>
+            <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1fr', gap: '12px' }}>
               <div style={{ background: 'rgba(15, 23, 42, 0.7)', border: '1px solid var(--border-glass)', padding: '16px', borderRadius: '12px', textAlign: 'center' }}>
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Batas Minimum (Entry)</div>
                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#94A3B8' }}>{insight.salary_min}</div>

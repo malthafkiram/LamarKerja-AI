@@ -141,10 +141,8 @@ export default function ATSResumeChecker({ onNavigateTab }) {
       style={{ maxWidth: "1200px", margin: "0 auto", padding: "10px 0 40px 0" }}
     >
       {/* Hero Header */}
-      <div
-        className="glass-panel"
-        style={{
-          padding: "30px 24px",
+      <div className="glass-panel page-hero" style={{
+        padding: "30px 24px",
           borderRadius: "20px",
           marginBottom: "24px",
           background:
@@ -205,9 +203,10 @@ export default function ATSResumeChecker({ onNavigateTab }) {
       {!auditResult ? (
         /* Input Form & Dropzone */
         <div
+          className="stack-mobile"
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(300px, 1fr) 340px",
+            gridTemplateColumns: "minmax(min(300px, 100%), 1fr) minmax(min(340px, 100%), 340px)",
             gap: "20px",
           }}
         >
@@ -227,6 +226,7 @@ export default function ATSResumeChecker({ onNavigateTab }) {
               style={{
                 display: "flex",
                 gap: "10px",
+                flexWrap: "wrap",
                 borderBottom: "1px solid var(--border-glass)",
                 paddingBottom: "14px",
               }}
@@ -604,7 +604,7 @@ export default function ATSResumeChecker({ onNavigateTab }) {
         <div style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
           {/* Top Score Card Banner */}
           <div
-            className="glass-panel"
+            className="glass-panel stack-mobile"
             style={{
               padding: "28px",
               borderRadius: "20px",
@@ -750,7 +750,7 @@ export default function ATSResumeChecker({ onNavigateTab }) {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(200px, 100%), 1fr))",
                 gap: "14px",
               }}
             >
@@ -965,7 +965,7 @@ export default function ATSResumeChecker({ onNavigateTab }) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
               gap: "18px",
             }}
           >

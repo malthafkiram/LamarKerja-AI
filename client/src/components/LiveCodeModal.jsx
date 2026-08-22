@@ -283,7 +283,7 @@ export default function LiveCodeModal({ isOpen, onClose, jobDetails, profile }) 
             <p style={{ margin: 0 }}>Merancang Soal Tes Teknis Khusus untuk {position} di {companyName}...</p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '16px' }}>
+          <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: '16px' }}>
             
             {/* Left: Problem Statement & Test Specs */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(15, 23, 42, 0.5)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border-glass)', maxHeight: '550px', overflowY: 'auto' }}>

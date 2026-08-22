@@ -17,6 +17,12 @@ import {
   parseToplokerJobsFromHtml
 } from './jobHubParsers.js';
 import {
+  collectLinkedInJobsForKeyword,
+  ingestLinkedInLiveSearch,
+  liveSearchCache,
+  shouldLiveIngestSearch
+} from './jobHubLinkedIn.js';
+import {
   INGEST_WINDOW_DAYS,
   PURGE_AFTER_DAYS,
   filterJobsWithinIngestWindow,
@@ -147,73 +153,15 @@ async function fetchLinkedInLiveJobs8Days() {
   ];
   const pageStarts = [0, 10];
 
-  const jobs = [];
   const seenUrls = new Set();
-
-  const parseCards = (html, kw) => {
-    const $ = cheerio.load(html);
-    $('li').each((_, el) => {
-      const title = $(el).find('.base-search-card__title').text().trim();
-      const company = $(el).find('.base-search-card__subtitle').text().trim();
-      const location = $(el).find('.job-search-card__location').text().trim();
-      let link = $(el).find('.base-card__full-link').attr('href');
-      const timeEl = $(el).find('time');
-      const timeAgo = timeEl.text().trim();
-      const datetimeAttr = timeEl.attr('datetime');
-      const postedFromAttr = datetimeAttr ? new Date(datetimeAttr) : null;
-      const posted_at = postedFromAttr && !Number.isNaN(postedFromAttr.getTime())
-        ? postedFromAttr
-        : new Date();
-
-      if (title && company && link) {
-        link = link.split('?')[0];
-        if (!seenUrls.has(link)) {
-          seenUrls.add(link);
-
-          let category = 'IT & Software';
-          const lowerTitle = (title + ' ' + kw).toLowerCase();
-          if (lowerTitle.includes('market') || lowerTitle.includes('sales') || lowerTitle.includes('business dev')) category = 'Marketing & Sales';
-          else if (lowerTitle.includes('admin') || lowerTitle.includes('hr') || lowerTitle.includes('human resource') || lowerTitle.includes('recruiter')) category = 'Admin & HR';
-          else if (lowerTitle.includes('finance') || lowerTitle.includes('account') || lowerTitle.includes('tax') || lowerTitle.includes('audit')) category = 'Finance';
-          else if (lowerTitle.includes('design') || lowerTitle.includes('ux') || lowerTitle.includes('creative') || lowerTitle.includes('graphic')) category = 'Design & Kreatif';
-          else if (lowerTitle.includes('bumn')) category = 'BUMN & Instansi';
-
-          jobs.push({
-            title,
-            company,
-            location: location || 'Indonesia',
-            platform: 'LinkedIn',
-            platform_badge_color: '#0A66C2',
-            job_url: link,
-            contact_email: '',
-            salary: 'Kompetitif (Standar LinkedIn)',
-            experience_level: 'Semua Level',
-            work_type: location.toLowerCase().includes('remote') ? 'Remote / WFH' : (location.toLowerCase().includes('hybrid') ? 'Hybrid' : 'Full-time'),
-            category,
-            description: `Lowongan kerja posisi ${title} di ${company} (${location || 'Indonesia'}). Diposting ${timeAgo || 'dalam 8 hari terakhir'} di LinkedIn.`,
-            requirements: [kw, 'Pengalaman Relevan', 'Komunikasi Baik', 'Portofolio / CV Terkini'],
-            tags: ['LinkedIn', kw, timeAgo || '8 Hari Terakhir', 'Terverifikasi'],
-            posted_at
-          });
-        }
-      }
-    });
-  };
-
+  const jobs = [];
   for (const kw of linkedInKeywords) {
-    for (const start of pageStarts) {
-      try {
-        const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(kw)}&location=Indonesia&f_TPR=r691200&start=${start}`;
-        const res = await axios.get(url, {
-          headers: BROWSER_HEADERS,
-          timeout: 9000
-        });
-        parseCards(res.data, kw);
-      } catch (err) {
-        console.warn(`LinkedIn keyword "${kw}" start=${start} note:`, err.message);
-      }
-      await sleep(250);
-    }
+    const batch = await collectLinkedInJobsForKeyword(kw, {
+      pageStarts,
+      delayMs: 250,
+      seenUrls
+    });
+    jobs.push(...batch);
   }
 
   const recent = filterJobsWithinIngestWindow(jobs);
@@ -667,6 +615,61 @@ const SEARCH_URL_EXCLUDE = {
   ]
 };
 
+const DIRECTORY_UPSERT_FIELDS = [
+  'title', 'company', 'location', 'platform', 'platform_badge_color',
+  'contact_email', 'salary', 'experience_level', 'work_type', 'category',
+  'description', 'requirements', 'tags', 'posted_at'
+];
+
+export async function persistDirectoryJobs(jobs) {
+  const rows = filterJobsWithinIngestWindow(jobs)
+    .filter((item) => isDirectJobPostingUrl(item.job_url))
+    .map((item) => ({
+      title: item.title,
+      company: item.company,
+      location: item.location,
+      platform: item.platform,
+      platform_badge_color: item.platform_badge_color,
+      job_url: item.job_url,
+      contact_email: item.contact_email || '',
+      salary: item.salary || 'Kompetitif',
+      experience_level: item.experience_level || 'Semua Level',
+      work_type: item.work_type || 'Full-time',
+      category: item.category || 'IT & Software',
+      description: item.description,
+      requirements: item.requirements || [],
+      tags: item.tags || [item.platform, 'Terverifikasi', '8 Hari Terakhir'],
+      posted_at: item.posted_at || new Date()
+    }));
+
+  if (!rows.length) return { inserted: 0, updated: 0, rows: 0 };
+
+  const existing = await JobDirectory.findAll({
+    where: { job_url: { [Op.in]: rows.map((r) => r.job_url) } },
+    attributes: ['job_url']
+  });
+  const existingUrls = new Set(existing.map((e) => e.job_url));
+  const inserted = rows.filter((r) => !existingUrls.has(r.job_url)).length;
+
+  await JobDirectory.bulkCreate(rows, { updateOnDuplicate: DIRECTORY_UPSERT_FIELDS });
+  return { inserted, updated: rows.length - inserted, rows: rows.length };
+}
+
+export async function ingestLinkedInLiveSearchForDirectory(query) {
+  const result = await ingestLinkedInLiveSearch(query, {
+    persistJobs: persistDirectoryJobs,
+    cache: liveSearchCache
+  });
+  if (result.attempted) {
+    console.log(
+      `✓ [JobHub] Live search LinkedIn "${result.keyword}": fetch ${result.fetched}, baru ${result.inserted}, update ${result.updated}`
+    );
+  }
+  return result;
+}
+
+export { shouldLiveIngestSearch };
+
 /**
  * Seed or Sync Multi-Platform Jobs from live feeds into PostgreSQL
  */
@@ -723,25 +726,7 @@ export async function seedOrSyncDirectoryJobs() {
 
     console.log(`📊 [JobHub] Total data terkumpul dari semua kanal: ${allSources.length} lowongan`);
 
-    const rows = filterJobsWithinIngestWindow(allSources)
-      .filter((item) => isDirectJobPostingUrl(item.job_url))
-      .map((item) => ({
-        title: item.title,
-        company: item.company,
-        location: item.location,
-        platform: item.platform,
-        platform_badge_color: item.platform_badge_color,
-        job_url: item.job_url,
-        contact_email: item.contact_email || '',
-        salary: item.salary || 'Kompetitif',
-        experience_level: item.experience_level || 'Semua Level',
-        work_type: item.work_type || 'Full-time',
-        category: item.category || 'IT & Software',
-        description: item.description,
-        requirements: item.requirements || [],
-        tags: item.tags || [item.platform, 'Terverifikasi', '8 Hari Terakhir'],
-        posted_at: item.posted_at || new Date()
-      }));
+    const { inserted, updated, rows } = await persistDirectoryJobs(allSources);
 
     const breakdown = {
       linkedIn: linkedInJobs.length,
@@ -754,7 +739,7 @@ export async function seedOrSyncDirectoryJobs() {
       remote: remotiveJobs.length + arbeitJobs.length + jobicyJobs.length + himalayasJobs.length + remoteOkJobs.length
     };
 
-    if (!rows.length) {
+    if (!rows) {
       const totalInDb = await JobDirectory.count({ where: { job_url: SEARCH_URL_EXCLUDE } });
       return {
         success: true,
@@ -768,24 +753,10 @@ export async function seedOrSyncDirectoryJobs() {
       };
     }
 
-    const existing = await JobDirectory.findAll({
-      where: { job_url: { [Op.in]: rows.map((r) => r.job_url) } },
-      attributes: ['job_url']
-    });
-    const existingUrls = new Set(existing.map((e) => e.job_url));
-    const inserted = rows.filter((r) => !existingUrls.has(r.job_url)).length;
-    const updated = rows.length - inserted;
-
-    await JobDirectory.bulkCreate(rows, {
-      updateOnDuplicate: [
-        'title', 'company', 'location', 'platform', 'platform_badge_color',
-        'contact_email', 'salary', 'experience_level', 'work_type', 'category',
-        'description', 'requirements', 'tags', 'posted_at'
-      ]
-    });
-
     let purgedUnseenRemote = 0;
-    const remoteUrls = rows.filter((r) => r.platform === 'Remote').map((r) => r.job_url);
+    const remoteUrls = filterJobsWithinIngestWindow(allSources)
+      .filter((r) => r.platform === 'Remote' && isDirectJobPostingUrl(r.job_url))
+      .map((r) => r.job_url);
     if (remoteUrls.length >= 10) {
       purgedUnseenRemote = await JobDirectory.destroy({
         where: {

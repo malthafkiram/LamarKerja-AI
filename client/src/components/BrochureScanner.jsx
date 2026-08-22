@@ -321,7 +321,7 @@ export default function BrochureScanner({ profile, settings, onApplicationSent, 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
       {/* Top Banner / Hero */}
-      <div className="glass-panel" style={{
+      <div className="glass-panel page-hero" style={{
         padding: '24px 32px',
         background: 'linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(99, 102, 241, 0.08) 100%)',
         display: 'flex',
@@ -437,11 +437,11 @@ export default function BrochureScanner({ profile, settings, onApplicationSent, 
       )}
 
       {/* Main Grid: Upload Dropzone & Results */}
-      <div style={{ display: 'grid', gridTemplateColumns: scanResult ? '1fr 1.4fr' : '1fr', gap: '24px' }}>
+      <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: scanResult ? '1fr 1.4fr' : '1fr', gap: '24px' }}>
         
         {/* Left Column: Dropzone & Image Preview */}
         <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
             <h2 style={{ fontSize: '1.1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FileImage size={20} color="#38BDF8" />
               {lang === 'id' ? '1. Berkas Poster / Brosur Loker' : '1. Recruitment Flyer / Poster File'}
@@ -726,7 +726,7 @@ export default function BrochureScanner({ profile, settings, onApplicationSent, 
               <div style={{ fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>
                 {lang === 'id' ? 'Hasil Ekstraksi Brosur' : 'Flyer Extraction Results'}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '12px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'rgba(15, 23, 42, 0.5)', padding: '10px 14px', borderRadius: '10px' }}>
                   <Building size={18} color="#38BDF8" />
                   <div>
@@ -821,7 +821,7 @@ export default function BrochureScanner({ profile, settings, onApplicationSent, 
                 paddingTop: '12px',
                 borderTop: '1px solid var(--border-glass)',
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(130px, 100%), 1fr))',
                 gap: '8px'
               }}>
                 <button
@@ -888,7 +888,7 @@ export default function BrochureScanner({ profile, settings, onApplicationSent, 
 
             {/* Email Composer & One-Click Send */}
             <div className="glass-panel" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap' }}>
                 <h3 style={{ fontSize: '1.05rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Send size={18} color="#0EA5E9" />
                   {lang === 'id' ? '2. Pratinjau & Pengiriman Email Lamaran' : '2. Application Email Preview & Sender'}

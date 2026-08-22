@@ -116,7 +116,7 @@ export default function CareerRoadmapModal({ isOpen, onClose, profile }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               
               {/* Market Fit & Salary Projection Banner */}
-              <div style={{
+              <div className="stack-mobile" style={{
                 display: 'grid',
                 gridTemplateColumns: '1.2fr 1fr 1fr',
                 gap: '12px',
@@ -157,7 +157,7 @@ export default function CareerRoadmapModal({ isOpen, onClose, profile }) {
                   <Zap size={16} /> Skill yang Paling Dibutuhkan & Perlu Dipelajari:
                 </h3>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '10px' }}>
                   {(roadmap.top_missing_skills || []).map((sk, idx) => (
                     <div key={idx} style={{
                       background: 'rgba(15, 23, 42, 0.8)',

@@ -523,7 +523,7 @@ export default function SettingsModal({
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div className="keep-cols" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             <button
               type="button"
               onClick={() => setLanguage('id')}
@@ -869,7 +869,7 @@ export default function SettingsModal({
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+          <div className="keep-cols" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             <div>
               <label style={{ fontSize: '0.76rem', color: 'var(--text-muted)', display: 'block', marginBottom: '3px' }}>
                 {lang === 'id' ? 'Model AI Utama:' : 'Primary AI Model:'}

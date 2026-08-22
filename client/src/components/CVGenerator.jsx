@@ -367,7 +367,7 @@ export default function CVGenerator({
     >
       {/* Header Banner */}
       <div
-        className="glass-panel"
+        className="glass-panel page-hero"
         style={{
           padding: "28px 32px",
           background:
@@ -500,7 +500,7 @@ export default function CVGenerator({
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(480px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(480px, 100%), 1fr))",
           gap: "24px",
           alignItems: "flex-start",
         }}
@@ -1249,6 +1249,7 @@ export default function CVGenerator({
                 </div>
 
                 <div
+                  className="stack-mobile"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "2fr 1fr 1fr",

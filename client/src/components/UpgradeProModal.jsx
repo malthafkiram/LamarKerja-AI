@@ -169,7 +169,7 @@ export default function UpgradeProModal({ isOpen, onClose, currentUser }) {
         </div>
 
         {/* Pricing Cards Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))', gap: '16px' }}>
           {plans.map((p) => {
             const isSelected = selectedPlan === p.id;
             return (
@@ -336,7 +336,7 @@ export default function UpgradeProModal({ isOpen, onClose, currentUser }) {
 
           {/* TAB 2: Manual Transfer */}
           {paymentMethodTab === 'manual' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'center', background: 'rgba(15, 23, 42, 0.85)', padding: '16px 18px', borderRadius: '14px', border: '1px solid var(--border-glass)' }}>
+            <div className="stack-mobile" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '12px', alignItems: 'center', background: 'rgba(15, 23, 42, 0.85)', padding: '16px 18px', borderRadius: '14px', border: '1px solid var(--border-glass)' }}>
               <div>
                 <div style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
                   {lang === 'id' ? 'Nomor E-Wallet (DANA, GoPay, OVO, ShopeePay):' : 'E-Wallet Number (DANA, GoPay, OVO, ShopeePay):'}

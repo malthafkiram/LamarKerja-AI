@@ -167,7 +167,7 @@ export default function CoverLetterModal({ isOpen, onClose, defaultCompany, defa
         </div>
 
         {/* Target Inputs & Language Switcher */}
-        <div style={{
+        <div className="stack-mobile" style={{
           background: 'rgba(15, 23, 42, 0.7)',
           border: '1px solid var(--border-glass)',
           borderRadius: '12px',
